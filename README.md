@@ -86,6 +86,6 @@ Resources:
   <img src="https://contrib.rocks/image?repo=coinbase/cdp-sdk" />
 </a>
 
-## 📝 License
+## 📝 Licensed 
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) file for details.
