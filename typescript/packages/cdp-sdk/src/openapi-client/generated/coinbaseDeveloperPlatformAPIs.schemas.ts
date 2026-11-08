@@ -5254,6 +5254,78 @@ export interface RevokeSpendPermissionRequest {
 }
 
 /**
+ * The globally unique ID of the catalog vault, which is a UUID prefixed with the string `cv_`.
+ * @pattern ^cv_[a-f0-9-]{36}$
+ */
+export type CatalogVaultId = string;
+
+/**
+ * The lifecycle status of the vault. A vault is `pending` from creation until its deployment user operation succeeds onchain, then `active`. If the deployment user operation fails onchain, then the status is `failed`.
+ */
+export type VaultStatus = (typeof VaultStatus)[keyof typeof VaultStatus];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const VaultStatus = {
+  pending: "pending",
+  active: "active",
+  failed: "failed",
+} as const;
+
+/**
+ * The trailing 30-day net APY of a lend resource, along with the timestamp of observation.
+ */
+export interface ApyMetrics {
+  /** The trailing 30-day net APY, in basis points, after all applicable performance fees. For example, `500` equates to 5%. Only present once sufficient history has been observed. */
+  apyBps?: number;
+  /** The time the APY metrics were last updated, in RFC 3339 format. Only present when `apyBps` is present. */
+  apyUpdatedAt?: string;
+}
+
+export type VaultMetricsAllOf = {
+  /** The total value locked in the vault, equivalent to the amount of funds deposited. It is expressed as a decimal string in standard unit denomination of the underlying asset. For example, `1000` equates to 1000 USDC. Only present once a TVL snapshot has been observed for the vault. */
+  tvl?: NonNegativeDecimal;
+  /** The time the TVL metrics were last updated, in RFC 3339 format. Only present when `tvl` is present. */
+  tvlUpdatedAt?: string;
+};
+
+/**
+ * The current performance metrics of a vault.
+ */
+export type VaultMetrics = ApyMetrics & VaultMetricsAllOf;
+
+/**
+ * A vault created on top of a catalog vault.
+ */
+export interface Vault {
+  vaultId: VaultId;
+  /**
+   * The 0x-prefixed onchain address of the vault. The address is deterministic and known at creation; the vault deploys at this address once the deployment user operation is included onchain.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  address: string;
+  catalogVaultId: CatalogVaultId;
+  /**
+   * Your performance fee, in basis points. CDP charges an additional fee equal to currently 10% (1000 bps) of your fee.
+   * @minimum 0
+   * @maximum 5000
+   */
+  performanceFeeBps: number;
+  /**
+   * The 0x-prefixed address that receives the vault's performance fees.
+   * @pattern ^0x[a-fA-F0-9]{40}$
+   */
+  feeRecipientAddress: string;
+  network: LendNetwork;
+  status: VaultStatus;
+  /** The time the vault was created, in RFC 3339 format. */
+  createdAt: string;
+  /** The symbol of the vault's underlying asset. */
+  underlyingAsset: Asset;
+  /** The vault's current metrics. Only present once at least one metrics snapshot has been observed for the vault. */
+  metrics?: VaultMetrics;
+}
+
+/**
  * The network on which to perform the swap.
  */
 export type EvmSwapsNetwork = (typeof EvmSwapsNetwork)[keyof typeof EvmSwapsNetwork];
@@ -7425,6 +7497,19 @@ export const PolicyScope = {
   account: "account",
 } as const;
 
+/**
+ * The current evaluation status of the policy.
+ */
+export type PolicyStatus = (typeof PolicyStatus)[keyof typeof PolicyStatus];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PolicyStatus = {
+  /** The policy is evaluated. */
+  PolicyStatusActive: "active",
+  /** The policy is skipped during evaluation, as if it were not attached. */
+  PolicyStatusPaused: "paused",
+} as const;
+
 export interface Policy {
   /**
    * The unique identifier for the policy.
@@ -7439,6 +7524,12 @@ Policy descriptions can consist of alphanumeric characters, spaces, commas, and 
   description?: string;
   /** The scope of the policy. Only one project-level policy can exist at any time. */
   scope: PolicyScope;
+  /** The current evaluation status of the policy. */
+  status?: PolicyStatus;
+  /** When the policy was paused. Present only when status is paused. */
+  pausedAt?: string;
+  /** When a paused policy resumes automatically. Absent for an indefinite pause. */
+  resumeAt?: string;
   rules: PolicyRules;
   /** The ISO 8601 timestamp at which the Policy was created. */
   createdAt: string;
@@ -8911,6 +9002,11 @@ With `reject`: `rule_rejected` means `matchedRule` matched all of its criteria a
   /** Policies iterated, in order: the project policy, then the account policy. Evaluation stops at the policy containing `matchedRule`. End-user operations consult only the project policy. */
   evaluatedPolicies: EvaluatedPolicy[];
   evaluatedUnit?: EvaluatedUnit;
+}
+
+export interface PausePolicyRequest {
+  /** Optional future time at which the policy resumes automatically, at most 30 days from the request. If omitted, the policy stays paused until resumed. */
+  resumeAt?: string;
 }
 
 export interface SolanaAccount {
@@ -11106,6 +11202,134 @@ export interface OnrampQuote {
   fees: OnrampOrderFee[];
   /** The exchange rate used to convert fiat to crypto i.e. the crypto value of one fiat. */
   exchangeRate: string;
+}
+
+/**
+ * An opaque server-issued token used in the App2App onramp handoff. Treat it as an opaque string — do not attempt to parse or decode its contents.
+ * @minLength 16
+ * @maxLength 2048
+ */
+export type OnrampMobileChallengeToken = string;
+
+/**
+ * A server-issued challenge for platform attestation in an App2App onramp handoff.
+ */
+export interface OnrampMobileChallenge {
+  /** An opaque server-issued token to be used with platform attestation (iOS App Attest or Android Play Integrity Standard). Treat it as an opaque string — do not attempt to parse its contents. Pass this value along with the attestation payload to the [Create Onramp Mobile Session](#operation/createOnrampMobileSession) endpoint to complete the App2App handoff.
+
+**iOS**: pass this value directly to `DCAppAttestService.generateAssertion(keyId, clientDataHash: SHA256(challenge))`.
+
+**Android**: compute `requestHash = base64url(SHA256(challenge))` and pass it to `StandardIntegrityManager.requestToken(requestHash)`. */
+  challenge: OnrampMobileChallengeToken;
+  /** The time at which the challenge expires. Challenges are short-lived; submit the attestation to [Create Onramp Mobile Session](#operation/createOnrampMobileSession) before this time or request a new challenge. */
+  expiresAt: string;
+}
+
+/**
+ * iOS App Attest assertion payload for verifying a signed challenge.
+ */
+export interface IosAssertionPayload {
+  /** The key identifier of the iOS App Attest key previously registered via the attestation registration endpoint. This is the `keyId` returned by `DCAppAttestService.generateKey()`. */
+  keyId: string;
+  /** Base64-encoded App Attest assertion generated by `DCAppAttestService.generateAssertion(keyId, clientDataHash: SHA256(challenge))`. */
+  assertion: string;
+}
+
+/**
+ * Android Play Integrity Standard API payload for verifying a signed challenge.
+ */
+export interface AndroidIntegrityPayload {
+  /** Play Integrity token (JWT) obtained from `StandardIntegrityManager.requestToken()`, proving this request originates from a genuine, unmodified installation of the partner app. The token must have been requested with `requestHash = base64url(SHA256(challenge))`, where `challenge` is the opaque token issued by the [Create Onramp Mobile Challenge](#operation/createOnrampMobileChallenge) endpoint. */
+  integrityToken: string;
+}
+
+/**
+ * Request body for creating an onramp mobile session.
+ */
+export type CreateOnrampMobileSessionRequest =
+  | (unknown & {
+      /** The challenge returned by the [Create Onramp Mobile Challenge](#operation/createOnrampMobileChallenge) endpoint. Must be passed back exactly as received — do not decode or modify. */
+      challenge: OnrampMobileChallengeToken;
+      ios?: IosAssertionPayload;
+      android?: AndroidIntegrityPayload;
+    })
+  | (unknown & {
+      /** The challenge returned by the [Create Onramp Mobile Challenge](#operation/createOnrampMobileChallenge) endpoint. Must be passed back exactly as received — do not decode or modify. */
+      challenge: OnrampMobileChallengeToken;
+      ios?: IosAssertionPayload;
+      android?: AndroidIntegrityPayload;
+    });
+
+/**
+ * A cryptographic challenge for iOS App Attest attestation. Used only by iOS clients - Android uses a different flow with Play Integrity Standard API tokens.
+ */
+export interface IosAttestationChallenge {
+  /**
+   * Base64-encoded cryptographically secure random challenge (32 bytes). This challenge is one-time use and must be included in the iOS attestation request.
+   * @minLength 44
+   * @maxLength 44
+   * @pattern ^[A-Za-z0-9+/]+=*$
+   */
+  challenge: string;
+  /** Timestamp when the challenge expires. Challenges are valid for 5 minutes. */
+  expiresAt: string;
+}
+
+/**
+ * iOS application bundle identifier (`CFBundleIdentifier`), as configured in the app's Xcode project / Info.plist, or shown for the App ID in Apple Developer. Must contain only alphanumeric characters (A–Z, a–z, 0–9), hyphens (-), and periods (.), typically in reverse-DNS form (e.g. `com.example.app`). Underscores are not permitted.
+ * @pattern ^[a-zA-Z0-9.-]+$
+ */
+export type IosBundleId = string;
+
+/**
+ * iOS App Attest payload for verification.
+ */
+export interface IosAttestationPayload {
+  /** The key identifier generated by DCAppAttestService. */
+  keyId: string;
+  /**
+   * Base64-encoded attestation object from DCAppAttestService.attestKey().
+   * @pattern ^[A-Za-z0-9+/]+=*$
+   */
+  attestation: string;
+  bundleId: IosBundleId;
+}
+
+/**
+ * Request to register device public key for iOS App Attest attestation. This endpoint is iOS-only. Android devices use Play Integrity Standard API tokens sent directly in request headers instead.
+ */
+export interface IosAttestationRegistrationRequest {
+  /**
+   * The challenge received from the challenge endpoint.
+   * @pattern ^[A-Za-z0-9+/]+=*$
+   */
+  challenge: string;
+  ios: IosAttestationPayload;
+}
+
+/**
+ * The mobile platform that was attested (iOS only).
+ */
+export type IosAttestationRegistrationResponsePlatform =
+  (typeof IosAttestationRegistrationResponsePlatform)[keyof typeof IosAttestationRegistrationResponsePlatform];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const IosAttestationRegistrationResponsePlatform = {
+  ios: "ios",
+} as const;
+
+/**
+ * Response confirming successful attestation verification and device key registration. The device public key is now stored for validating future assertion signatures.
+ */
+export interface IosAttestationRegistrationResponse {
+  /** The key identifier that was registered. Include this value in subsequent [Create Onramp Mobile Session](#operation/createOnrampMobileSession) requests as `ios.keyId`. */
+  keyId: string;
+  /** The mobile platform that was attested (iOS only). */
+  platform: IosAttestationRegistrationResponsePlatform;
+  /** The verified Apple application identifier in `teamID.bundleID` format. This is not a CDP project ID. */
+  appId: string;
+  /** Timestamp when the attestation was performed. */
+  attestedAt: string;
 }
 
 /**
@@ -13756,6 +13980,84 @@ export type CustomersRequirementChangedEvent = CustomersEventBase &
   CustomersRequirementChangedEventAllOf;
 
 /**
+ * The globally unique ID of the vault, which is a UUID prefixed with the string `vault_`.
+ * @pattern ^vault_[a-f0-9-]{36}$
+ */
+export type VaultId = string;
+
+/**
+ * The network on which the lend resource (catalog vault or vault) is deployed.
+ */
+export type LendNetwork = (typeof LendNetwork)[keyof typeof LendNetwork];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const LendNetwork = {
+  base: "base",
+} as const;
+
+/**
+ * A non-negative decimal string without scientific notation, whitespace, leading zeros, or a trailing dot. Zero is allowed.
+ * @pattern ^(0|[1-9][0-9]*)([.][0-9]+)?$
+ */
+export type NonNegativeDecimal = string;
+
+/**
+ * Fields shared by vault fee redemption requests. Composed into `EoaVaultRedeemFeesRequest` and `SmartAccountVaultRedeemFeesRequest`, which add their account-specific fields on top.
+ */
+export interface VaultRedeemFeesRequest {
+  vaultId: VaultId;
+  /**
+   * The maximum share-price movement tolerated between calldata construction and onchain execution, in basis points. Defaults to 100 bps (1%) when omitted.
+   * @minimum 0
+   * @maximum 9999
+   */
+  maxSlippageBps?: number;
+}
+
+/**
+ * A request to redeem the fee shares held by the vault's fee recipient EVM account for the vault's underlying asset (e.g. USDC). The account signs an EIP-2612 permit over its vault shares, and the share approval and redemption are executed in a single transaction.
+ */
+export type EoaVaultRedeemFeesRequestAllOf = { [key: string]: unknown };
+
+export type EoaVaultRedeemFeesRequest = VaultRedeemFeesRequest & EoaVaultRedeemFeesRequestAllOf;
+
+/**
+ * A request to redeem the fee shares held by the vault's fee recipient EVM Smart Account for the vault's underlying asset (e.g. USDC). The share approval and redemption are batched into a single user operation.
+ */
+export type SmartAccountVaultRedeemFeesRequestAllOf = {
+  /** Whether to use CDP Paymaster to sponsor gas fees. When true, the user operation gas will be paid by the Paymaster, allowing the account to redeem fees without holding native gas tokens. Cannot be used together with `paymasterUrl`. */
+  useCdpPaymaster?: boolean;
+  /** Optional custom Paymaster URL to use for gas sponsorship. This allows you to use your own Paymaster service instead of CDP's Paymaster. Cannot be used together with `useCdpPaymaster`. */
+  paymasterUrl?: Url;
+  paymasterContext?: PaymasterContext;
+};
+
+export type SmartAccountVaultRedeemFeesRequest = VaultRedeemFeesRequest &
+  SmartAccountVaultRedeemFeesRequestAllOf;
+
+/**
+ * The result of a vault fee redemption from an EVM account after broadcast.
+ */
+export interface EoaVaultRedeemFeesResponse {
+  /**
+   * The hash of the broadcast fee redemption transaction, as a 0x-prefixed hex string.
+   * @pattern ^0x[0-9a-fA-F]{64}$
+   */
+  transactionHash: string;
+}
+
+/**
+ * The result of a vault fee redemption from an EVM Smart Account after broadcast.
+ */
+export interface SmartAccountVaultRedeemFeesResponse {
+  /**
+   * The hash of the user operation executing the fee redemption, as a 0x-prefixed hex string. Poll `getUserOperation` for the operation's status.
+   * @pattern ^0x[0-9a-fA-F]{64}$
+   */
+  userOpHash: string;
+}
+
+/**
  * Idempotency key conflict.
  */
 export type IdempotencyErrorResponse = Error;
@@ -15262,6 +15564,29 @@ export type ListSpendPermissions200AllOf = {
 
 export type ListSpendPermissions200 = ListSpendPermissions200AllOf & ListResponse;
 
+export type ListVaultsParams = {
+  /**
+   * The number of vaults to return per page.
+   * @minimum 1
+   * @maximum 1000
+   */
+  pageSize?: number;
+  /**
+   * The token for the next page of resources, if any.
+   */
+  pageToken?: PageTokenParameter;
+};
+
+/**
+ * Response containing a list of vaults.
+ */
+export type ListVaults200AllOf = {
+  /** The list of vaults created by the project. */
+  vaults: Vault[];
+};
+
+export type ListVaults200 = ListVaults200AllOf & ListResponse;
+
 export type GetEvmSwapPriceParams = {
   network: EvmSwapsNetwork;
   toToken: ToToken;
@@ -15885,6 +16210,16 @@ export type GetOnrampOrderById200 = {
 export type CreateOnrampSession201 = {
   session: OnrampSession;
   quote?: OnrampQuote;
+};
+
+export type CreateOnrampMobileChallengeBodyAllOf = { [key: string]: unknown };
+
+export type CreateOnrampMobileChallengeBody = OnrampSessionRequest &
+  CreateOnrampMobileChallengeBodyAllOf &
+  Required<Pick<OnrampSessionRequest & CreateOnrampMobileChallengeBodyAllOf, "redirectUrl">>;
+
+export type CreateOnrampMobileSession201 = {
+  session: OnrampSession;
 };
 
 export type GetOnrampUserLimitsBody = {

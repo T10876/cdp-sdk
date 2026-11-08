@@ -13,8 +13,10 @@ export type { SimulatePoliciesRequest, PolicySimulationResult } from "./openapi-
 export {
   CreatePolicyBodySchema,
   UpdatePolicyBodySchema,
+  PausePolicyBodySchema,
   type CreatePolicyBody,
   type UpdatePolicyBody,
+  type PausePolicyBody,
 } from "./policies/types.js";
 export { NetworkError } from "./openapi-client/errors.js";
 export type { SpendPermission, SpendPermissionInput } from "./spend-permissions/types.js";
@@ -59,6 +61,13 @@ export type {
   CreateWebhookSubscriptionResult,
   WebhookEventType,
 } from "./actions/webhooks/index.js";
+
+export type {
+  ListVaultsOptions,
+  ListVaultsResult,
+  GetVaultOptions,
+} from "./client/lend/lend.types.js";
+export type { Vault, VaultMetrics, VaultStatus } from "./openapi-client/index.js";
 
 export { parseEther, parseUnits } from "viem";
 

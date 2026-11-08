@@ -7731,6 +7731,46 @@ pub mod types {
             Default::default()
         }
     }
+    ///Android Play Integrity Standard API payload for verifying a signed challenge.
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "description": "Android Play Integrity Standard API payload for verifying a signed challenge.",
+    ///  "type": "object",
+    ///  "required": [
+    ///    "integrityToken"
+    ///  ],
+    ///  "properties": {
+    ///    "integrityToken": {
+    ///      "description": "Play Integrity token (JWT) obtained from `StandardIntegrityManager.requestToken()`, proving this request originates from a genuine, unmodified installation of the partner app. The token must have been requested with `requestHash = base64url(SHA256(challenge))`, where `challenge` is the opaque token issued by the [Create Onramp Mobile Challenge](#operation/createOnrampMobileChallenge) endpoint.",
+    ///      "examples": [
+    ///        "eyJhbGci..."
+    ///      ],
+    ///      "type": "string"
+    ///    }
+    ///  },
+    ///  "x-audience": "public"
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+    pub struct AndroidIntegrityPayload {
+        ///Play Integrity token (JWT) obtained from `StandardIntegrityManager.requestToken()`, proving this request originates from a genuine, unmodified installation of the partner app. The token must have been requested with `requestHash = base64url(SHA256(challenge))`, where `challenge` is the opaque token issued by the [Create Onramp Mobile Challenge](#operation/createOnrampMobileChallenge) endpoint.
+        #[serde(rename = "integrityToken")]
+        pub integrity_token: ::std::string::String,
+    }
+    impl ::std::convert::From<&AndroidIntegrityPayload> for AndroidIntegrityPayload {
+        fn from(value: &AndroidIntegrityPayload) -> Self {
+            value.clone()
+        }
+    }
+    impl AndroidIntegrityPayload {
+        pub fn builder() -> builder::AndroidIntegrityPayload {
+            Default::default()
+        }
+    }
     ///An attempt to attach a funding source to a mandate and make it usable. A successful approval sets the mandate's `source` and moves the mandate to `approval_succeeded`; a failed one moves the mandate to `approval_failed` and can be retried by submitting a new approval. A mandate holds at most one active source, so at most one approval ever succeeds. The network transactions that grant the spending allowance are on `onchainTransactions`.
     ///
     /// <details><summary>JSON schema</summary>
@@ -8221,6 +8261,69 @@ pub mod types {
                 .map_err(|e: self::error::ConversionError| {
                     <D::Error as ::serde::de::Error>::custom(e.to_string())
                 })
+        }
+    }
+    ///The trailing 30-day net APY of a lend resource, along with the timestamp of observation.
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "description": "The trailing 30-day net APY of a lend resource, along with the timestamp of observation.",
+    ///  "type": "object",
+    ///  "properties": {
+    ///    "apyBps": {
+    ///      "description": "The trailing 30-day net APY, in basis points, after all applicable performance fees. For example, `500` equates to 5%. Only present once sufficient history has been observed.",
+    ///      "examples": [
+    ///        500
+    ///      ],
+    ///      "type": "integer"
+    ///    },
+    ///    "apyUpdatedAt": {
+    ///      "description": "The time the APY metrics were last updated, in RFC 3339 format. Only present when `apyBps` is present.",
+    ///      "examples": [
+    ///        "2026-09-22T00:00:00Z"
+    ///      ],
+    ///      "type": "string",
+    ///      "format": "date-time"
+    ///    }
+    ///  }
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+    pub struct ApyMetrics {
+        ///The trailing 30-day net APY, in basis points, after all applicable performance fees. For example, `500` equates to 5%. Only present once sufficient history has been observed.
+        #[serde(
+            rename = "apyBps",
+            default,
+            skip_serializing_if = "::std::option::Option::is_none"
+        )]
+        pub apy_bps: ::std::option::Option<i64>,
+        ///The time the APY metrics were last updated, in RFC 3339 format. Only present when `apyBps` is present.
+        #[serde(
+            rename = "apyUpdatedAt",
+            default,
+            skip_serializing_if = "::std::option::Option::is_none"
+        )]
+        pub apy_updated_at: ::std::option::Option<::chrono::DateTime<::chrono::offset::Utc>>,
+    }
+    impl ::std::convert::From<&ApyMetrics> for ApyMetrics {
+        fn from(value: &ApyMetrics) -> Self {
+            value.clone()
+        }
+    }
+    impl ::std::default::Default for ApyMetrics {
+        fn default() -> Self {
+            Self {
+                apy_bps: Default::default(),
+                apy_updated_at: Default::default(),
+            }
+        }
+    }
+    impl ApyMetrics {
+        pub fn builder() -> builder::ApyMetrics {
+            Default::default()
         }
     }
     ///The symbol of the asset (e.g., eth, usd, usdc, usdt).
@@ -13109,6 +13212,85 @@ pub mod types {
         }
     }
     impl<'de> ::serde::Deserialize<'de> for CapturePaymentSessionXIdempotencyKey {
+        fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+        where
+            D: ::serde::Deserializer<'de>,
+        {
+            ::std::string::String::deserialize(deserializer)?
+                .parse()
+                .map_err(|e: self::error::ConversionError| {
+                    <D::Error as ::serde::de::Error>::custom(e.to_string())
+                })
+        }
+    }
+    ///The globally unique ID of the catalog vault, which is a UUID prefixed with the string `cv_`.
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "description": "The globally unique ID of the catalog vault, which is a UUID prefixed with the string `cv_`.",
+    ///  "examples": [
+    ///    "cv_019ee022-3586-7473-8354-b2c32c18221a"
+    ///  ],
+    ///  "type": "string",
+    ///  "pattern": "^cv_[a-f0-9-]{36}$"
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    #[serde(transparent)]
+    pub struct CatalogVaultId(::std::string::String);
+    impl ::std::ops::Deref for CatalogVaultId {
+        type Target = ::std::string::String;
+        fn deref(&self) -> &::std::string::String {
+            &self.0
+        }
+    }
+    impl ::std::convert::From<CatalogVaultId> for ::std::string::String {
+        fn from(value: CatalogVaultId) -> Self {
+            value.0
+        }
+    }
+    impl ::std::convert::From<&CatalogVaultId> for CatalogVaultId {
+        fn from(value: &CatalogVaultId) -> Self {
+            value.clone()
+        }
+    }
+    impl ::std::str::FromStr for CatalogVaultId {
+        type Err = self::error::ConversionError;
+        fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            static PATTERN: ::std::sync::LazyLock<::regress::Regex> =
+                ::std::sync::LazyLock::new(|| ::regress::Regex::new("^cv_[a-f0-9-]{36}$").unwrap());
+            if PATTERN.find(value).is_none() {
+                return Err("doesn't match pattern \"^cv_[a-f0-9-]{36}$\"".into());
+            }
+            Ok(Self(value.to_string()))
+        }
+    }
+    impl ::std::convert::TryFrom<&str> for CatalogVaultId {
+        type Error = self::error::ConversionError;
+        fn try_from(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<&::std::string::String> for CatalogVaultId {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: &::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<::std::string::String> for CatalogVaultId {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: ::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl<'de> ::serde::Deserialize<'de> for CatalogVaultId {
         fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
         where
             D: ::serde::Deserializer<'de>,
@@ -21366,6 +21548,103 @@ pub mod types {
                 })
         }
     }
+    ///Request body for creating an onramp mobile session.
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "description": "Request body for creating an onramp mobile session.",
+    ///  "type": "object",
+    ///  "oneOf": [
+    ///    {
+    ///      "title": "iOS",
+    ///      "required": [
+    ///        "ios"
+    ///      ]
+    ///    },
+    ///    {
+    ///      "title": "Android",
+    ///      "required": [
+    ///        "android"
+    ///      ]
+    ///    }
+    ///  ],
+    ///  "required": [
+    ///    "challenge"
+    ///  ],
+    ///  "properties": {
+    ///    "android": {
+    ///      "$ref": "#/components/schemas/AndroidIntegrityPayload"
+    ///    },
+    ///    "challenge": {
+    ///      "description": "The challenge returned by the [Create Onramp Mobile Challenge](#operation/createOnrampMobileChallenge) endpoint. Must be passed back exactly as received — do not decode or modify.",
+    ///      "allOf": [
+    ///        {
+    ///          "$ref": "#/components/schemas/OnrampMobileChallengeToken"
+    ///        }
+    ///      ]
+    ///    },
+    ///    "ios": {
+    ///      "$ref": "#/components/schemas/IosAssertionPayload"
+    ///    }
+    ///  }
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+    #[serde(untagged)]
+    pub enum CreateOnrampMobileSessionRequest {
+        Variant0 {
+            ///The challenge returned by the [Create Onramp Mobile Challenge](#operation/createOnrampMobileChallenge) endpoint. Must be passed back exactly as received — do not decode or modify.
+            challenge: OnrampMobileChallengeToken,
+            ios: IosAssertionPayload,
+        },
+        Variant1 {
+            android: AndroidIntegrityPayload,
+            ///The challenge returned by the [Create Onramp Mobile Challenge](#operation/createOnrampMobileChallenge) endpoint. Must be passed back exactly as received — do not decode or modify.
+            challenge: OnrampMobileChallengeToken,
+        },
+    }
+    impl ::std::convert::From<&Self> for CreateOnrampMobileSessionRequest {
+        fn from(value: &CreateOnrampMobileSessionRequest) -> Self {
+            value.clone()
+        }
+    }
+    ///`CreateOnrampMobileSessionResponse`
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "type": "object",
+    ///  "required": [
+    ///    "session"
+    ///  ],
+    ///  "properties": {
+    ///    "session": {
+    ///      "$ref": "#/components/schemas/OnrampSession"
+    ///    }
+    ///  }
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+    pub struct CreateOnrampMobileSessionResponse {
+        pub session: OnrampSession,
+    }
+    impl ::std::convert::From<&CreateOnrampMobileSessionResponse>
+        for CreateOnrampMobileSessionResponse
+    {
+        fn from(value: &CreateOnrampMobileSessionResponse) -> Self {
+            value.clone()
+        }
+    }
+    impl CreateOnrampMobileSessionResponse {
+        pub fn builder() -> builder::CreateOnrampMobileSessionResponse {
+            Default::default()
+        }
+    }
     ///`CreateOnrampOrderBody`
     ///
     /// <details><summary>JSON schema</summary>
@@ -25257,7 +25536,7 @@ pub mod types {
         */
         pub requirements: RequirementsMap,
         /**Terms of Service acceptances recorded for the customer.
-         */
+        */
         #[serde(
             rename = "tosAcceptances",
             default,
@@ -25762,7 +26041,7 @@ pub mod types {
         }
     }
     /**The type of the customer. Required on create; accepted but ignored on update.
-     */
+    */
     ///
     /// <details><summary>JSON schema</summary>
     ///
@@ -32966,6 +33245,163 @@ pub mod types {
     impl EntityWebhookResponseLabels {
         pub fn builder() -> builder::EntityWebhookResponseLabels {
             Default::default()
+        }
+    }
+    ///`EoaVaultRedeemFeesRequest`
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "$ref": "#/components/schemas/VaultRedeemFeesRequest"
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+    #[serde(transparent)]
+    pub struct EoaVaultRedeemFeesRequest(pub VaultRedeemFeesRequest);
+    impl ::std::ops::Deref for EoaVaultRedeemFeesRequest {
+        type Target = VaultRedeemFeesRequest;
+        fn deref(&self) -> &VaultRedeemFeesRequest {
+            &self.0
+        }
+    }
+    impl ::std::convert::From<EoaVaultRedeemFeesRequest> for VaultRedeemFeesRequest {
+        fn from(value: EoaVaultRedeemFeesRequest) -> Self {
+            value.0
+        }
+    }
+    impl ::std::convert::From<&EoaVaultRedeemFeesRequest> for EoaVaultRedeemFeesRequest {
+        fn from(value: &EoaVaultRedeemFeesRequest) -> Self {
+            value.clone()
+        }
+    }
+    impl ::std::convert::From<VaultRedeemFeesRequest> for EoaVaultRedeemFeesRequest {
+        fn from(value: VaultRedeemFeesRequest) -> Self {
+            Self(value)
+        }
+    }
+    ///The result of a vault fee redemption from an EVM account after broadcast.
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "description": "The result of a vault fee redemption from an EVM account after broadcast.",
+    ///  "type": "object",
+    ///  "required": [
+    ///    "transactionHash"
+    ///  ],
+    ///  "properties": {
+    ///    "transactionHash": {
+    ///      "description": "The hash of the broadcast fee redemption transaction, as a 0x-prefixed hex string.",
+    ///      "examples": [
+    ///        "0xf8f98fb6726fc936f24b2007df5cb20e2b8444ff3dfaa2a929335f432a9be2e7"
+    ///      ],
+    ///      "type": "string",
+    ///      "pattern": "^0x[0-9a-fA-F]{64}$"
+    ///    }
+    ///  }
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+    pub struct EoaVaultRedeemFeesResponse {
+        ///The hash of the broadcast fee redemption transaction, as a 0x-prefixed hex string.
+        #[serde(rename = "transactionHash")]
+        pub transaction_hash: EoaVaultRedeemFeesResponseTransactionHash,
+    }
+    impl ::std::convert::From<&EoaVaultRedeemFeesResponse> for EoaVaultRedeemFeesResponse {
+        fn from(value: &EoaVaultRedeemFeesResponse) -> Self {
+            value.clone()
+        }
+    }
+    impl EoaVaultRedeemFeesResponse {
+        pub fn builder() -> builder::EoaVaultRedeemFeesResponse {
+            Default::default()
+        }
+    }
+    ///The hash of the broadcast fee redemption transaction, as a 0x-prefixed hex string.
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "description": "The hash of the broadcast fee redemption transaction, as a 0x-prefixed hex string.",
+    ///  "examples": [
+    ///    "0xf8f98fb6726fc936f24b2007df5cb20e2b8444ff3dfaa2a929335f432a9be2e7"
+    ///  ],
+    ///  "type": "string",
+    ///  "pattern": "^0x[0-9a-fA-F]{64}$"
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    #[serde(transparent)]
+    pub struct EoaVaultRedeemFeesResponseTransactionHash(::std::string::String);
+    impl ::std::ops::Deref for EoaVaultRedeemFeesResponseTransactionHash {
+        type Target = ::std::string::String;
+        fn deref(&self) -> &::std::string::String {
+            &self.0
+        }
+    }
+    impl ::std::convert::From<EoaVaultRedeemFeesResponseTransactionHash> for ::std::string::String {
+        fn from(value: EoaVaultRedeemFeesResponseTransactionHash) -> Self {
+            value.0
+        }
+    }
+    impl ::std::convert::From<&EoaVaultRedeemFeesResponseTransactionHash>
+        for EoaVaultRedeemFeesResponseTransactionHash
+    {
+        fn from(value: &EoaVaultRedeemFeesResponseTransactionHash) -> Self {
+            value.clone()
+        }
+    }
+    impl ::std::str::FromStr for EoaVaultRedeemFeesResponseTransactionHash {
+        type Err = self::error::ConversionError;
+        fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            static PATTERN: ::std::sync::LazyLock<::regress::Regex> =
+                ::std::sync::LazyLock::new(|| {
+                    ::regress::Regex::new("^0x[0-9a-fA-F]{64}$").unwrap()
+                });
+            if PATTERN.find(value).is_none() {
+                return Err("doesn't match pattern \"^0x[0-9a-fA-F]{64}$\"".into());
+            }
+            Ok(Self(value.to_string()))
+        }
+    }
+    impl ::std::convert::TryFrom<&str> for EoaVaultRedeemFeesResponseTransactionHash {
+        type Error = self::error::ConversionError;
+        fn try_from(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<&::std::string::String> for EoaVaultRedeemFeesResponseTransactionHash {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: &::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<::std::string::String> for EoaVaultRedeemFeesResponseTransactionHash {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: ::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl<'de> ::serde::Deserialize<'de> for EoaVaultRedeemFeesResponseTransactionHash {
+        fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+        where
+            D: ::serde::Deserializer<'de>,
+        {
+            ::std::string::String::deserialize(deserializer)?
+                .parse()
+                .map_err(|e: self::error::ConversionError| {
+                    <D::Error as ::serde::de::Error>::custom(e.to_string())
+                })
         }
     }
     ///An ERC-20 approval transaction payload. The payer must send `data` as an EVM transaction via `eth_sendTransaction` and return the resulting transaction hash.
@@ -49829,7 +50265,7 @@ pub mod types {
         #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
         pub address: ::std::option::Option<IndividualInputAddress>,
         /**ISO 3166-1 alpha-2 country code representing the customer's citizenship.
-         */
+        */
         #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
         pub citizenship: ::std::option::Option<CountryCode>,
         ///Date of birth.
@@ -49843,7 +50279,7 @@ pub mod types {
         #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
         pub email: ::std::option::Option<Email>,
         /**Current employment status.
-         */
+        */
         #[serde(
             rename = "employmentStatus",
             default,
@@ -49875,7 +50311,7 @@ pub mod types {
         )]
         pub first_name: ::std::option::Option<::std::string::String>,
         /**Full Social Security Number (US only).
-         */
+        */
         #[serde(
             rename = "fullSsn",
             default,
@@ -49890,7 +50326,7 @@ pub mod types {
         )]
         pub last_name: ::std::option::Option<::std::string::String>,
         /**Industry or occupation.
-         */
+        */
         #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
         pub occupation: ::std::option::Option<IndividualInputOccupation>,
         ///Phone number in [E.164](https://en.wikipedia.org/wiki/E.164) format.
@@ -49901,7 +50337,7 @@ pub mod types {
         )]
         pub phone_number: ::std::option::Option<PhoneNumber>,
         /**Primary purpose for using Coinbase services.
-         */
+        */
         #[serde(
             rename = "purposeOfAccount",
             default,
@@ -49909,7 +50345,7 @@ pub mod types {
         )]
         pub purpose_of_account: ::std::option::Option<IndividualInputPurposeOfAccount>,
         /**Primary source of funds for the account.
-         */
+        */
         #[serde(
             rename = "sourceOfFunds",
             default,
@@ -50191,7 +50627,7 @@ pub mod types {
         }
     }
     /**Current employment status.
-     */
+    */
     ///
     /// <details><summary>JSON schema</summary>
     ///
@@ -50452,7 +50888,7 @@ pub mod types {
         }
     }
     /**Full Social Security Number (US only).
-     */
+    */
     ///
     /// <details><summary>JSON schema</summary>
     ///
@@ -50540,7 +50976,7 @@ pub mod types {
         }
     }
     /**Industry or occupation.
-     */
+    */
     ///
     /// <details><summary>JSON schema</summary>
     ///
@@ -50842,7 +51278,7 @@ pub mod types {
         }
     }
     /**Primary purpose for using Coinbase services.
-     */
+    */
     ///
     /// <details><summary>JSON schema</summary>
     ///
@@ -50994,7 +51430,7 @@ pub mod types {
         }
     }
     /**Primary source of funds for the account.
-     */
+    */
     ///
     /// <details><summary>JSON schema</summary>
     ///
@@ -51944,6 +52380,705 @@ pub mod types {
                 })
         }
     }
+    ///iOS App Attest assertion payload for verifying a signed challenge.
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "description": "iOS App Attest assertion payload for verifying a signed challenge.",
+    ///  "type": "object",
+    ///  "required": [
+    ///    "assertion",
+    ///    "keyId"
+    ///  ],
+    ///  "properties": {
+    ///    "assertion": {
+    ///      "description": "Base64-encoded App Attest assertion generated by `DCAppAttestService.generateAssertion(keyId, clientDataHash: SHA256(challenge))`.",
+    ///      "examples": [
+    ///        "eyJhbGci..."
+    ///      ],
+    ///      "type": "string"
+    ///    },
+    ///    "keyId": {
+    ///      "description": "The key identifier of the iOS App Attest key previously registered via the attestation registration endpoint. This is the `keyId` returned by `DCAppAttestService.generateKey()`.",
+    ///      "examples": [
+    ///        "abc123def456"
+    ///      ],
+    ///      "type": "string"
+    ///    }
+    ///  },
+    ///  "x-audience": "public"
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+    pub struct IosAssertionPayload {
+        ///Base64-encoded App Attest assertion generated by `DCAppAttestService.generateAssertion(keyId, clientDataHash: SHA256(challenge))`.
+        pub assertion: ::std::string::String,
+        ///The key identifier of the iOS App Attest key previously registered via the attestation registration endpoint. This is the `keyId` returned by `DCAppAttestService.generateKey()`.
+        #[serde(rename = "keyId")]
+        pub key_id: ::std::string::String,
+    }
+    impl ::std::convert::From<&IosAssertionPayload> for IosAssertionPayload {
+        fn from(value: &IosAssertionPayload) -> Self {
+            value.clone()
+        }
+    }
+    impl IosAssertionPayload {
+        pub fn builder() -> builder::IosAssertionPayload {
+            Default::default()
+        }
+    }
+    ///A cryptographic challenge for iOS App Attest attestation. Used only by iOS clients - Android uses a different flow with Play Integrity Standard API tokens.
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "description": "A cryptographic challenge for iOS App Attest attestation. Used only by iOS clients - Android uses a different flow with Play Integrity Standard API tokens.",
+    ///  "type": "object",
+    ///  "required": [
+    ///    "challenge",
+    ///    "expiresAt"
+    ///  ],
+    ///  "properties": {
+    ///    "challenge": {
+    ///      "description": "Base64-encoded cryptographically secure random challenge (32 bytes). This challenge is one-time use and must be included in the iOS attestation request.",
+    ///      "examples": [
+    ///        "YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXoxMjM0NTY="
+    ///      ],
+    ///      "type": "string",
+    ///      "maxLength": 44,
+    ///      "minLength": 44,
+    ///      "pattern": "^[A-Za-z0-9+/]+=*$"
+    ///    },
+    ///    "expiresAt": {
+    ///      "description": "Timestamp when the challenge expires. Challenges are valid for 5 minutes.",
+    ///      "examples": [
+    ///        "2026-02-03T10:35:00Z"
+    ///      ],
+    ///      "type": "string",
+    ///      "format": "date-time"
+    ///    }
+    ///  },
+    ///  "x-audience": "public"
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+    pub struct IosAttestationChallenge {
+        ///Base64-encoded cryptographically secure random challenge (32 bytes). This challenge is one-time use and must be included in the iOS attestation request.
+        pub challenge: IosAttestationChallengeChallenge,
+        ///Timestamp when the challenge expires. Challenges are valid for 5 minutes.
+        #[serde(rename = "expiresAt")]
+        pub expires_at: ::chrono::DateTime<::chrono::offset::Utc>,
+    }
+    impl ::std::convert::From<&IosAttestationChallenge> for IosAttestationChallenge {
+        fn from(value: &IosAttestationChallenge) -> Self {
+            value.clone()
+        }
+    }
+    impl IosAttestationChallenge {
+        pub fn builder() -> builder::IosAttestationChallenge {
+            Default::default()
+        }
+    }
+    ///Base64-encoded cryptographically secure random challenge (32 bytes). This challenge is one-time use and must be included in the iOS attestation request.
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "description": "Base64-encoded cryptographically secure random challenge (32 bytes). This challenge is one-time use and must be included in the iOS attestation request.",
+    ///  "examples": [
+    ///    "YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXoxMjM0NTY="
+    ///  ],
+    ///  "type": "string",
+    ///  "maxLength": 44,
+    ///  "minLength": 44,
+    ///  "pattern": "^[A-Za-z0-9+/]+=*$"
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    #[serde(transparent)]
+    pub struct IosAttestationChallengeChallenge(::std::string::String);
+    impl ::std::ops::Deref for IosAttestationChallengeChallenge {
+        type Target = ::std::string::String;
+        fn deref(&self) -> &::std::string::String {
+            &self.0
+        }
+    }
+    impl ::std::convert::From<IosAttestationChallengeChallenge> for ::std::string::String {
+        fn from(value: IosAttestationChallengeChallenge) -> Self {
+            value.0
+        }
+    }
+    impl ::std::convert::From<&IosAttestationChallengeChallenge> for IosAttestationChallengeChallenge {
+        fn from(value: &IosAttestationChallengeChallenge) -> Self {
+            value.clone()
+        }
+    }
+    impl ::std::str::FromStr for IosAttestationChallengeChallenge {
+        type Err = self::error::ConversionError;
+        fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            if value.chars().count() > 44usize {
+                return Err("longer than 44 characters".into());
+            }
+            if value.chars().count() < 44usize {
+                return Err("shorter than 44 characters".into());
+            }
+            static PATTERN: ::std::sync::LazyLock<::regress::Regex> =
+                ::std::sync::LazyLock::new(|| ::regress::Regex::new("^[A-Za-z0-9+/]+=*$").unwrap());
+            if PATTERN.find(value).is_none() {
+                return Err("doesn't match pattern \"^[A-Za-z0-9+/]+=*$\"".into());
+            }
+            Ok(Self(value.to_string()))
+        }
+    }
+    impl ::std::convert::TryFrom<&str> for IosAttestationChallengeChallenge {
+        type Error = self::error::ConversionError;
+        fn try_from(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<&::std::string::String> for IosAttestationChallengeChallenge {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: &::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<::std::string::String> for IosAttestationChallengeChallenge {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: ::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl<'de> ::serde::Deserialize<'de> for IosAttestationChallengeChallenge {
+        fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+        where
+            D: ::serde::Deserializer<'de>,
+        {
+            ::std::string::String::deserialize(deserializer)?
+                .parse()
+                .map_err(|e: self::error::ConversionError| {
+                    <D::Error as ::serde::de::Error>::custom(e.to_string())
+                })
+        }
+    }
+    ///iOS App Attest payload for verification.
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "description": "iOS App Attest payload for verification.",
+    ///  "examples": [
+    ///    {
+    ///      "attestation": "b2F1dGhEYXRhQUFDSmdhVWRpY0FBQ1VqZw==",
+    ///      "bundleId": "com.example.myapp",
+    ///      "keyId": "abc123def456"
+    ///    }
+    ///  ],
+    ///  "type": "object",
+    ///  "required": [
+    ///    "attestation",
+    ///    "bundleId",
+    ///    "keyId"
+    ///  ],
+    ///  "properties": {
+    ///    "attestation": {
+    ///      "description": "Base64-encoded attestation object from DCAppAttestService.attestKey().",
+    ///      "examples": [
+    ///        "b2F1dGhEYXRhQUFDSmdhVWRpY0FBQ1VqZw=="
+    ///      ],
+    ///      "type": "string",
+    ///      "pattern": "^[A-Za-z0-9+/]+=*$"
+    ///    },
+    ///    "bundleId": {
+    ///      "$ref": "#/components/schemas/IosBundleId"
+    ///    },
+    ///    "keyId": {
+    ///      "description": "The key identifier generated by DCAppAttestService.",
+    ///      "examples": [
+    ///        "abc123def456"
+    ///      ],
+    ///      "type": "string"
+    ///    }
+    ///  },
+    ///  "x-audience": "public"
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+    pub struct IosAttestationPayload {
+        ///Base64-encoded attestation object from DCAppAttestService.attestKey().
+        pub attestation: IosAttestationPayloadAttestation,
+        #[serde(rename = "bundleId")]
+        pub bundle_id: IosBundleId,
+        ///The key identifier generated by DCAppAttestService.
+        #[serde(rename = "keyId")]
+        pub key_id: ::std::string::String,
+    }
+    impl ::std::convert::From<&IosAttestationPayload> for IosAttestationPayload {
+        fn from(value: &IosAttestationPayload) -> Self {
+            value.clone()
+        }
+    }
+    impl IosAttestationPayload {
+        pub fn builder() -> builder::IosAttestationPayload {
+            Default::default()
+        }
+    }
+    ///Base64-encoded attestation object from DCAppAttestService.attestKey().
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "description": "Base64-encoded attestation object from DCAppAttestService.attestKey().",
+    ///  "examples": [
+    ///    "b2F1dGhEYXRhQUFDSmdhVWRpY0FBQ1VqZw=="
+    ///  ],
+    ///  "type": "string",
+    ///  "pattern": "^[A-Za-z0-9+/]+=*$"
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    #[serde(transparent)]
+    pub struct IosAttestationPayloadAttestation(::std::string::String);
+    impl ::std::ops::Deref for IosAttestationPayloadAttestation {
+        type Target = ::std::string::String;
+        fn deref(&self) -> &::std::string::String {
+            &self.0
+        }
+    }
+    impl ::std::convert::From<IosAttestationPayloadAttestation> for ::std::string::String {
+        fn from(value: IosAttestationPayloadAttestation) -> Self {
+            value.0
+        }
+    }
+    impl ::std::convert::From<&IosAttestationPayloadAttestation> for IosAttestationPayloadAttestation {
+        fn from(value: &IosAttestationPayloadAttestation) -> Self {
+            value.clone()
+        }
+    }
+    impl ::std::str::FromStr for IosAttestationPayloadAttestation {
+        type Err = self::error::ConversionError;
+        fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            static PATTERN: ::std::sync::LazyLock<::regress::Regex> =
+                ::std::sync::LazyLock::new(|| ::regress::Regex::new("^[A-Za-z0-9+/]+=*$").unwrap());
+            if PATTERN.find(value).is_none() {
+                return Err("doesn't match pattern \"^[A-Za-z0-9+/]+=*$\"".into());
+            }
+            Ok(Self(value.to_string()))
+        }
+    }
+    impl ::std::convert::TryFrom<&str> for IosAttestationPayloadAttestation {
+        type Error = self::error::ConversionError;
+        fn try_from(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<&::std::string::String> for IosAttestationPayloadAttestation {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: &::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<::std::string::String> for IosAttestationPayloadAttestation {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: ::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl<'de> ::serde::Deserialize<'de> for IosAttestationPayloadAttestation {
+        fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+        where
+            D: ::serde::Deserializer<'de>,
+        {
+            ::std::string::String::deserialize(deserializer)?
+                .parse()
+                .map_err(|e: self::error::ConversionError| {
+                    <D::Error as ::serde::de::Error>::custom(e.to_string())
+                })
+        }
+    }
+    ///Request to register device public key for iOS App Attest attestation. This endpoint is iOS-only. Android devices use Play Integrity Standard API tokens sent directly in request headers instead.
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "description": "Request to register device public key for iOS App Attest attestation. This endpoint is iOS-only. Android devices use Play Integrity Standard API tokens sent directly in request headers instead.",
+    ///  "type": "object",
+    ///  "required": [
+    ///    "challenge",
+    ///    "ios"
+    ///  ],
+    ///  "properties": {
+    ///    "challenge": {
+    ///      "description": "The challenge received from the challenge endpoint.",
+    ///      "examples": [
+    ///        "YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXoxMjM0NTY="
+    ///      ],
+    ///      "type": "string",
+    ///      "pattern": "^[A-Za-z0-9+/]+=*$"
+    ///    },
+    ///    "ios": {
+    ///      "$ref": "#/components/schemas/IosAttestationPayload"
+    ///    }
+    ///  },
+    ///  "x-audience": "public"
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+    pub struct IosAttestationRegistrationRequest {
+        ///The challenge received from the challenge endpoint.
+        pub challenge: IosAttestationRegistrationRequestChallenge,
+        pub ios: IosAttestationPayload,
+    }
+    impl ::std::convert::From<&IosAttestationRegistrationRequest>
+        for IosAttestationRegistrationRequest
+    {
+        fn from(value: &IosAttestationRegistrationRequest) -> Self {
+            value.clone()
+        }
+    }
+    impl IosAttestationRegistrationRequest {
+        pub fn builder() -> builder::IosAttestationRegistrationRequest {
+            Default::default()
+        }
+    }
+    ///The challenge received from the challenge endpoint.
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "description": "The challenge received from the challenge endpoint.",
+    ///  "examples": [
+    ///    "YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXoxMjM0NTY="
+    ///  ],
+    ///  "type": "string",
+    ///  "pattern": "^[A-Za-z0-9+/]+=*$"
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    #[serde(transparent)]
+    pub struct IosAttestationRegistrationRequestChallenge(::std::string::String);
+    impl ::std::ops::Deref for IosAttestationRegistrationRequestChallenge {
+        type Target = ::std::string::String;
+        fn deref(&self) -> &::std::string::String {
+            &self.0
+        }
+    }
+    impl ::std::convert::From<IosAttestationRegistrationRequestChallenge> for ::std::string::String {
+        fn from(value: IosAttestationRegistrationRequestChallenge) -> Self {
+            value.0
+        }
+    }
+    impl ::std::convert::From<&IosAttestationRegistrationRequestChallenge>
+        for IosAttestationRegistrationRequestChallenge
+    {
+        fn from(value: &IosAttestationRegistrationRequestChallenge) -> Self {
+            value.clone()
+        }
+    }
+    impl ::std::str::FromStr for IosAttestationRegistrationRequestChallenge {
+        type Err = self::error::ConversionError;
+        fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            static PATTERN: ::std::sync::LazyLock<::regress::Regex> =
+                ::std::sync::LazyLock::new(|| ::regress::Regex::new("^[A-Za-z0-9+/]+=*$").unwrap());
+            if PATTERN.find(value).is_none() {
+                return Err("doesn't match pattern \"^[A-Za-z0-9+/]+=*$\"".into());
+            }
+            Ok(Self(value.to_string()))
+        }
+    }
+    impl ::std::convert::TryFrom<&str> for IosAttestationRegistrationRequestChallenge {
+        type Error = self::error::ConversionError;
+        fn try_from(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<&::std::string::String>
+        for IosAttestationRegistrationRequestChallenge
+    {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: &::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<::std::string::String> for IosAttestationRegistrationRequestChallenge {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: ::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl<'de> ::serde::Deserialize<'de> for IosAttestationRegistrationRequestChallenge {
+        fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+        where
+            D: ::serde::Deserializer<'de>,
+        {
+            ::std::string::String::deserialize(deserializer)?
+                .parse()
+                .map_err(|e: self::error::ConversionError| {
+                    <D::Error as ::serde::de::Error>::custom(e.to_string())
+                })
+        }
+    }
+    ///Response confirming successful attestation verification and device key registration. The device public key is now stored for validating future assertion signatures.
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "description": "Response confirming successful attestation verification and device key registration. The device public key is now stored for validating future assertion signatures.",
+    ///  "type": "object",
+    ///  "required": [
+    ///    "appId",
+    ///    "attestedAt",
+    ///    "keyId",
+    ///    "platform"
+    ///  ],
+    ///  "properties": {
+    ///    "appId": {
+    ///      "description": "The verified Apple application identifier in `teamID.bundleID` format. This is not a CDP project ID.",
+    ///      "examples": [
+    ///        "ABCDE12345.com.example.myapp"
+    ///      ],
+    ///      "type": "string"
+    ///    },
+    ///    "attestedAt": {
+    ///      "description": "Timestamp when the attestation was performed.",
+    ///      "examples": [
+    ///        "2026-02-03T10:30:00Z"
+    ///      ],
+    ///      "type": "string",
+    ///      "format": "date-time"
+    ///    },
+    ///    "keyId": {
+    ///      "description": "The key identifier that was registered. Include this value in subsequent [Create Onramp Mobile Session](#operation/createOnrampMobileSession) requests as `ios.keyId`.",
+    ///      "examples": [
+    ///        "abc123def456"
+    ///      ],
+    ///      "type": "string"
+    ///    },
+    ///    "platform": {
+    ///      "description": "The mobile platform that was attested (iOS only).",
+    ///      "examples": [
+    ///        "ios"
+    ///      ],
+    ///      "type": "string",
+    ///      "enum": [
+    ///        "ios"
+    ///      ]
+    ///    }
+    ///  },
+    ///  "x-audience": "public"
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+    pub struct IosAttestationRegistrationResponse {
+        ///The verified Apple application identifier in `teamID.bundleID` format. This is not a CDP project ID.
+        #[serde(rename = "appId")]
+        pub app_id: ::std::string::String,
+        ///Timestamp when the attestation was performed.
+        #[serde(rename = "attestedAt")]
+        pub attested_at: ::chrono::DateTime<::chrono::offset::Utc>,
+        ///The key identifier that was registered. Include this value in subsequent [Create Onramp Mobile Session](#operation/createOnrampMobileSession) requests as `ios.keyId`.
+        #[serde(rename = "keyId")]
+        pub key_id: ::std::string::String,
+        ///The mobile platform that was attested (iOS only).
+        pub platform: IosAttestationRegistrationResponsePlatform,
+    }
+    impl ::std::convert::From<&IosAttestationRegistrationResponse>
+        for IosAttestationRegistrationResponse
+    {
+        fn from(value: &IosAttestationRegistrationResponse) -> Self {
+            value.clone()
+        }
+    }
+    impl IosAttestationRegistrationResponse {
+        pub fn builder() -> builder::IosAttestationRegistrationResponse {
+            Default::default()
+        }
+    }
+    ///The mobile platform that was attested (iOS only).
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "description": "The mobile platform that was attested (iOS only).",
+    ///  "examples": [
+    ///    "ios"
+    ///  ],
+    ///  "type": "string",
+    ///  "enum": [
+    ///    "ios"
+    ///  ]
+    ///}
+    /// ```
+    /// </details>
+    #[derive(
+        ::serde::Deserialize,
+        ::serde::Serialize,
+        Clone,
+        Copy,
+        Debug,
+        Eq,
+        Hash,
+        Ord,
+        PartialEq,
+        PartialOrd,
+    )]
+    pub enum IosAttestationRegistrationResponsePlatform {
+        #[serde(rename = "ios")]
+        Ios,
+    }
+    impl ::std::convert::From<&Self> for IosAttestationRegistrationResponsePlatform {
+        fn from(value: &IosAttestationRegistrationResponsePlatform) -> Self {
+            value.clone()
+        }
+    }
+    impl ::std::fmt::Display for IosAttestationRegistrationResponsePlatform {
+        fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+            match *self {
+                Self::Ios => f.write_str("ios"),
+            }
+        }
+    }
+    impl ::std::str::FromStr for IosAttestationRegistrationResponsePlatform {
+        type Err = self::error::ConversionError;
+        fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            match value {
+                "ios" => Ok(Self::Ios),
+                _ => Err("invalid value".into()),
+            }
+        }
+    }
+    impl ::std::convert::TryFrom<&str> for IosAttestationRegistrationResponsePlatform {
+        type Error = self::error::ConversionError;
+        fn try_from(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<&::std::string::String>
+        for IosAttestationRegistrationResponsePlatform
+    {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: &::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<::std::string::String> for IosAttestationRegistrationResponsePlatform {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: ::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    ///iOS application bundle identifier (`CFBundleIdentifier`), as configured in the app's Xcode project / Info.plist, or shown for the App ID in Apple Developer. Must contain only alphanumeric characters (A–Z, a–z, 0–9), hyphens (-), and periods (.), typically in reverse-DNS form (e.g. `com.example.app`). Underscores are not permitted.
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "description": "iOS application bundle identifier (`CFBundleIdentifier`), as configured in the app's Xcode project / Info.plist, or shown for the App ID in Apple Developer. Must contain only alphanumeric characters (A–Z, a–z, 0–9), hyphens (-), and periods (.), typically in reverse-DNS form (e.g. `com.example.app`). Underscores are not permitted.",
+    ///  "examples": [
+    ///    "com.example.app"
+    ///  ],
+    ///  "type": "string",
+    ///  "pattern": "^[a-zA-Z0-9.-]+$"
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    #[serde(transparent)]
+    pub struct IosBundleId(::std::string::String);
+    impl ::std::ops::Deref for IosBundleId {
+        type Target = ::std::string::String;
+        fn deref(&self) -> &::std::string::String {
+            &self.0
+        }
+    }
+    impl ::std::convert::From<IosBundleId> for ::std::string::String {
+        fn from(value: IosBundleId) -> Self {
+            value.0
+        }
+    }
+    impl ::std::convert::From<&IosBundleId> for IosBundleId {
+        fn from(value: &IosBundleId) -> Self {
+            value.clone()
+        }
+    }
+    impl ::std::str::FromStr for IosBundleId {
+        type Err = self::error::ConversionError;
+        fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            static PATTERN: ::std::sync::LazyLock<::regress::Regex> =
+                ::std::sync::LazyLock::new(|| ::regress::Regex::new("^[a-zA-Z0-9.-]+$").unwrap());
+            if PATTERN.find(value).is_none() {
+                return Err("doesn't match pattern \"^[a-zA-Z0-9.-]+$\"".into());
+            }
+            Ok(Self(value.to_string()))
+        }
+    }
+    impl ::std::convert::TryFrom<&str> for IosBundleId {
+        type Error = self::error::ConversionError;
+        fn try_from(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<&::std::string::String> for IosBundleId {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: &::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<::std::string::String> for IosBundleId {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: ::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl<'de> ::serde::Deserialize<'de> for IosBundleId {
+        fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+        where
+            D: ::serde::Deserializer<'de>,
+        {
+            ::std::string::String::deserialize(deserializer)?
+                .parse()
+                .map_err(|e: self::error::ConversionError| {
+                    <D::Error as ::serde::de::Error>::custom(e.to_string())
+                })
+        }
+    }
     /**Indicates whether **Coinbase is acting as the intermediary Virtual Asset Service Provider (VASP)**, and your organization is acting as an originating VASP on behalf of your own end customer.
 
     **Background:**
@@ -52194,6 +53329,82 @@ pub mod types {
         }
     }
     impl ::std::convert::TryFrom<::std::string::String> for KnownIdlType {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: ::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    ///The network on which the lend resource (catalog vault or vault) is deployed.
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "description": "The network on which the lend resource (catalog vault or vault) is deployed.",
+    ///  "examples": [
+    ///    "base"
+    ///  ],
+    ///  "type": "string",
+    ///  "enum": [
+    ///    "base"
+    ///  ]
+    ///}
+    /// ```
+    /// </details>
+    #[derive(
+        ::serde::Deserialize,
+        ::serde::Serialize,
+        Clone,
+        Copy,
+        Debug,
+        Eq,
+        Hash,
+        Ord,
+        PartialEq,
+        PartialOrd,
+    )]
+    pub enum LendNetwork {
+        #[serde(rename = "base")]
+        Base,
+    }
+    impl ::std::convert::From<&Self> for LendNetwork {
+        fn from(value: &LendNetwork) -> Self {
+            value.clone()
+        }
+    }
+    impl ::std::fmt::Display for LendNetwork {
+        fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+            match *self {
+                Self::Base => f.write_str("base"),
+            }
+        }
+    }
+    impl ::std::str::FromStr for LendNetwork {
+        type Err = self::error::ConversionError;
+        fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            match value {
+                "base" => Ok(Self::Base),
+                _ => Err("invalid value".into()),
+            }
+        }
+    }
+    impl ::std::convert::TryFrom<&str> for LendNetwork {
+        type Error = self::error::ConversionError;
+        fn try_from(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<&::std::string::String> for LendNetwork {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: &::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<::std::string::String> for LendNetwork {
         type Error = self::error::ConversionError;
         fn try_from(
             value: ::std::string::String,
@@ -55347,6 +56558,58 @@ pub mod types {
                 })
         }
     }
+    ///`ListVaultsResponse`
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "allOf": [
+    ///    {
+    ///      "description": "Response containing a list of vaults.",
+    ///      "type": "object",
+    ///      "required": [
+    ///        "vaults"
+    ///      ],
+    ///      "properties": {
+    ///        "vaults": {
+    ///          "description": "The list of vaults created by the project.",
+    ///          "type": "array",
+    ///          "items": {
+    ///            "$ref": "#/components/schemas/Vault"
+    ///          }
+    ///        }
+    ///      }
+    ///    },
+    ///    {
+    ///      "$ref": "#/components/schemas/ListResponse"
+    ///    }
+    ///  ]
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+    pub struct ListVaultsResponse {
+        ///The token for the next page of items, if any.
+        #[serde(
+            rename = "nextPageToken",
+            default,
+            skip_serializing_if = "::std::option::Option::is_none"
+        )]
+        pub next_page_token: ::std::option::Option<::std::string::String>,
+        ///The list of vaults created by the project.
+        pub vaults: ::std::vec::Vec<Vault>,
+    }
+    impl ::std::convert::From<&ListVaultsResponse> for ListVaultsResponse {
+        fn from(value: &ListVaultsResponse) -> Self {
+            value.clone()
+        }
+    }
+    impl ListVaultsResponse {
+        pub fn builder() -> builder::ListVaultsResponse {
+            Default::default()
+        }
+    }
     ///`LookupEndUserResponse`
     ///
     /// <details><summary>JSON schema</summary>
@@ -57120,7 +58383,7 @@ pub mod types {
         }
     }
     /**Information about the end user's MFA enrollments.
-     */
+    */
     ///
     /// <details><summary>JSON schema</summary>
     ///
@@ -59057,6 +60320,87 @@ pub mod types {
             value: ::std::string::String,
         ) -> ::std::result::Result<Self, self::error::ConversionError> {
             value.parse()
+        }
+    }
+    ///A non-negative decimal string without scientific notation, whitespace, leading zeros, or a trailing dot. Zero is allowed.
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "description": "A non-negative decimal string without scientific notation, whitespace, leading zeros, or a trailing dot. Zero is allowed.",
+    ///  "examples": [
+    ///    "100.00"
+    ///  ],
+    ///  "type": "string",
+    ///  "pattern": "^(0|[1-9][0-9]*)([.][0-9]+)?$"
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    #[serde(transparent)]
+    pub struct NonNegativeDecimal(::std::string::String);
+    impl ::std::ops::Deref for NonNegativeDecimal {
+        type Target = ::std::string::String;
+        fn deref(&self) -> &::std::string::String {
+            &self.0
+        }
+    }
+    impl ::std::convert::From<NonNegativeDecimal> for ::std::string::String {
+        fn from(value: NonNegativeDecimal) -> Self {
+            value.0
+        }
+    }
+    impl ::std::convert::From<&NonNegativeDecimal> for NonNegativeDecimal {
+        fn from(value: &NonNegativeDecimal) -> Self {
+            value.clone()
+        }
+    }
+    impl ::std::str::FromStr for NonNegativeDecimal {
+        type Err = self::error::ConversionError;
+        fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            static PATTERN: ::std::sync::LazyLock<::regress::Regex> =
+                ::std::sync::LazyLock::new(|| {
+                    ::regress::Regex::new("^(0|[1-9][0-9]*)([.][0-9]+)?$").unwrap()
+                });
+            if PATTERN.find(value).is_none() {
+                return Err("doesn't match pattern \"^(0|[1-9][0-9]*)([.][0-9]+)?$\"".into());
+            }
+            Ok(Self(value.to_string()))
+        }
+    }
+    impl ::std::convert::TryFrom<&str> for NonNegativeDecimal {
+        type Error = self::error::ConversionError;
+        fn try_from(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<&::std::string::String> for NonNegativeDecimal {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: &::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<::std::string::String> for NonNegativeDecimal {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: ::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl<'de> ::serde::Deserialize<'de> for NonNegativeDecimal {
+        fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+        where
+            D: ::serde::Deserializer<'de>,
+        {
+            ::std::string::String::deserialize(deserializer)?
+                .parse()
+                .map_err(|e: self::error::ConversionError| {
+                    <D::Error as ::serde::de::Error>::custom(e.to_string())
+                })
         }
     }
     ///Information about an end user who authenticates using a third-party provider.
@@ -62089,7 +63433,7 @@ pub mod types {
         }
     }
     /**Schema information for the query result. This is a derived schema from the query result, so types may not match the underlying table.
-     */
+    */
     ///
     /// <details><summary>JSON schema</summary>
     ///
@@ -63438,6 +64782,145 @@ pub mod types {
             value: ::std::string::String,
         ) -> ::std::result::Result<Self, self::error::ConversionError> {
             value.parse()
+        }
+    }
+    ///A server-issued challenge for platform attestation in an App2App onramp handoff.
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "description": "A server-issued challenge for platform attestation in an App2App onramp handoff.",
+    ///  "type": "object",
+    ///  "required": [
+    ///    "challenge",
+    ///    "expiresAt"
+    ///  ],
+    ///  "properties": {
+    ///    "challenge": {
+    ///      "description": "An opaque server-issued token to be used with platform attestation (iOS App Attest or Android Play Integrity Standard). Treat it as an opaque string — do not attempt to parse its contents. Pass this value along with the attestation payload to the [Create Onramp Mobile Session](#operation/createOnrampMobileSession) endpoint to complete the App2App handoff.\n\n**iOS**: pass this value directly to `DCAppAttestService.generateAssertion(keyId, clientDataHash: SHA256(challenge))`.\n\n**Android**: compute `requestHash = base64url(SHA256(challenge))` and pass it to `StandardIntegrityManager.requestToken(requestHash)`.",
+    ///      "examples": [
+    ///        "MWYwNWQwODktZTZlYy02OTdlLTgzZTYtMTI3NzcyOWJhNjM3"
+    ///      ],
+    ///      "allOf": [
+    ///        {
+    ///          "$ref": "#/components/schemas/OnrampMobileChallengeToken"
+    ///        }
+    ///      ]
+    ///    },
+    ///    "expiresAt": {
+    ///      "description": "The time at which the challenge expires. Challenges are short-lived; submit the attestation to [Create Onramp Mobile Session](#operation/createOnrampMobileSession) before this time or request a new challenge.",
+    ///      "examples": [
+    ///        "2025-04-24T00:05:00Z"
+    ///      ],
+    ///      "type": "string",
+    ///      "format": "date-time"
+    ///    }
+    ///  }
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+    pub struct OnrampMobileChallenge {
+        /**An opaque server-issued token to be used with platform attestation (iOS App Attest or Android Play Integrity Standard). Treat it as an opaque string — do not attempt to parse its contents. Pass this value along with the attestation payload to the [Create Onramp Mobile Session](#operation/createOnrampMobileSession) endpoint to complete the App2App handoff.
+
+        **iOS**: pass this value directly to `DCAppAttestService.generateAssertion(keyId, clientDataHash: SHA256(challenge))`.
+
+        **Android**: compute `requestHash = base64url(SHA256(challenge))` and pass it to `StandardIntegrityManager.requestToken(requestHash)`.*/
+        pub challenge: OnrampMobileChallengeToken,
+        ///The time at which the challenge expires. Challenges are short-lived; submit the attestation to [Create Onramp Mobile Session](#operation/createOnrampMobileSession) before this time or request a new challenge.
+        #[serde(rename = "expiresAt")]
+        pub expires_at: ::chrono::DateTime<::chrono::offset::Utc>,
+    }
+    impl ::std::convert::From<&OnrampMobileChallenge> for OnrampMobileChallenge {
+        fn from(value: &OnrampMobileChallenge) -> Self {
+            value.clone()
+        }
+    }
+    impl OnrampMobileChallenge {
+        pub fn builder() -> builder::OnrampMobileChallenge {
+            Default::default()
+        }
+    }
+    ///An opaque server-issued token used in the App2App onramp handoff. Treat it as an opaque string — do not attempt to parse or decode its contents.
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "description": "An opaque server-issued token used in the App2App onramp handoff. Treat it as an opaque string — do not attempt to parse or decode its contents.",
+    ///  "examples": [
+    ///    "MWYwNWQwODktZTZlYy02OTdlLTgzZTYtMTI3NzcyOWJhNjM3"
+    ///  ],
+    ///  "type": "string",
+    ///  "maxLength": 2048,
+    ///  "minLength": 16
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    #[serde(transparent)]
+    pub struct OnrampMobileChallengeToken(::std::string::String);
+    impl ::std::ops::Deref for OnrampMobileChallengeToken {
+        type Target = ::std::string::String;
+        fn deref(&self) -> &::std::string::String {
+            &self.0
+        }
+    }
+    impl ::std::convert::From<OnrampMobileChallengeToken> for ::std::string::String {
+        fn from(value: OnrampMobileChallengeToken) -> Self {
+            value.0
+        }
+    }
+    impl ::std::convert::From<&OnrampMobileChallengeToken> for OnrampMobileChallengeToken {
+        fn from(value: &OnrampMobileChallengeToken) -> Self {
+            value.clone()
+        }
+    }
+    impl ::std::str::FromStr for OnrampMobileChallengeToken {
+        type Err = self::error::ConversionError;
+        fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            if value.chars().count() > 2048usize {
+                return Err("longer than 2048 characters".into());
+            }
+            if value.chars().count() < 16usize {
+                return Err("shorter than 16 characters".into());
+            }
+            Ok(Self(value.to_string()))
+        }
+    }
+    impl ::std::convert::TryFrom<&str> for OnrampMobileChallengeToken {
+        type Error = self::error::ConversionError;
+        fn try_from(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<&::std::string::String> for OnrampMobileChallengeToken {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: &::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<::std::string::String> for OnrampMobileChallengeToken {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: ::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl<'de> ::serde::Deserialize<'de> for OnrampMobileChallengeToken {
+        fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+        where
+            D: ::serde::Deserializer<'de>,
+        {
+            ::std::string::String::deserialize(deserializer)?
+                .parse()
+                .map_err(|e: self::error::ConversionError| {
+                    <D::Error as ::serde::de::Error>::custom(e.to_string())
+                })
         }
     }
     ///An Onramp order.
@@ -66993,6 +68476,214 @@ pub mod types {
         }
     }
     impl<'de> ::serde::Deserialize<'de> for Owner {
+        fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+        where
+            D: ::serde::Deserializer<'de>,
+        {
+            ::std::string::String::deserialize(deserializer)?
+                .parse()
+                .map_err(|e: self::error::ConversionError| {
+                    <D::Error as ::serde::de::Error>::custom(e.to_string())
+                })
+        }
+    }
+    ///`PausePolicyPolicyId`
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "type": "string",
+    ///  "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    #[serde(transparent)]
+    pub struct PausePolicyPolicyId(::std::string::String);
+    impl ::std::ops::Deref for PausePolicyPolicyId {
+        type Target = ::std::string::String;
+        fn deref(&self) -> &::std::string::String {
+            &self.0
+        }
+    }
+    impl ::std::convert::From<PausePolicyPolicyId> for ::std::string::String {
+        fn from(value: PausePolicyPolicyId) -> Self {
+            value.0
+        }
+    }
+    impl ::std::convert::From<&PausePolicyPolicyId> for PausePolicyPolicyId {
+        fn from(value: &PausePolicyPolicyId) -> Self {
+            value.clone()
+        }
+    }
+    impl ::std::str::FromStr for PausePolicyPolicyId {
+        type Err = self::error::ConversionError;
+        fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            static PATTERN: ::std::sync::LazyLock<::regress::Regex> = ::std::sync::LazyLock::new(
+                || {
+                    ::regress::Regex::new(
+                        "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+                    )
+                    .unwrap()
+                },
+            );
+            if PATTERN.find(value).is_none() {
+                return Err(
+                    "doesn't match pattern \"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$\""
+                        .into(),
+                );
+            }
+            Ok(Self(value.to_string()))
+        }
+    }
+    impl ::std::convert::TryFrom<&str> for PausePolicyPolicyId {
+        type Error = self::error::ConversionError;
+        fn try_from(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<&::std::string::String> for PausePolicyPolicyId {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: &::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<::std::string::String> for PausePolicyPolicyId {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: ::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl<'de> ::serde::Deserialize<'de> for PausePolicyPolicyId {
+        fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+        where
+            D: ::serde::Deserializer<'de>,
+        {
+            ::std::string::String::deserialize(deserializer)?
+                .parse()
+                .map_err(|e: self::error::ConversionError| {
+                    <D::Error as ::serde::de::Error>::custom(e.to_string())
+                })
+        }
+    }
+    ///`PausePolicyRequest`
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "type": "object",
+    ///  "properties": {
+    ///    "resumeAt": {
+    ///      "description": "Optional future time at which the policy resumes automatically, at most 30 days from the request. If omitted, the policy stays paused until resumed.",
+    ///      "examples": [
+    ///        "2026-09-30T12:00:00Z"
+    ///      ],
+    ///      "type": "string",
+    ///      "format": "date-time"
+    ///    }
+    ///  }
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+    pub struct PausePolicyRequest {
+        ///Optional future time at which the policy resumes automatically, at most 30 days from the request. If omitted, the policy stays paused until resumed.
+        #[serde(
+            rename = "resumeAt",
+            default,
+            skip_serializing_if = "::std::option::Option::is_none"
+        )]
+        pub resume_at: ::std::option::Option<::chrono::DateTime<::chrono::offset::Utc>>,
+    }
+    impl ::std::convert::From<&PausePolicyRequest> for PausePolicyRequest {
+        fn from(value: &PausePolicyRequest) -> Self {
+            value.clone()
+        }
+    }
+    impl ::std::default::Default for PausePolicyRequest {
+        fn default() -> Self {
+            Self {
+                resume_at: Default::default(),
+            }
+        }
+    }
+    impl PausePolicyRequest {
+        pub fn builder() -> builder::PausePolicyRequest {
+            Default::default()
+        }
+    }
+    ///`PausePolicyXIdempotencyKey`
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "type": "string",
+    ///  "maxLength": 128,
+    ///  "minLength": 1
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    #[serde(transparent)]
+    pub struct PausePolicyXIdempotencyKey(::std::string::String);
+    impl ::std::ops::Deref for PausePolicyXIdempotencyKey {
+        type Target = ::std::string::String;
+        fn deref(&self) -> &::std::string::String {
+            &self.0
+        }
+    }
+    impl ::std::convert::From<PausePolicyXIdempotencyKey> for ::std::string::String {
+        fn from(value: PausePolicyXIdempotencyKey) -> Self {
+            value.0
+        }
+    }
+    impl ::std::convert::From<&PausePolicyXIdempotencyKey> for PausePolicyXIdempotencyKey {
+        fn from(value: &PausePolicyXIdempotencyKey) -> Self {
+            value.clone()
+        }
+    }
+    impl ::std::str::FromStr for PausePolicyXIdempotencyKey {
+        type Err = self::error::ConversionError;
+        fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            if value.chars().count() > 128usize {
+                return Err("longer than 128 characters".into());
+            }
+            if value.chars().count() < 1usize {
+                return Err("shorter than 1 characters".into());
+            }
+            Ok(Self(value.to_string()))
+        }
+    }
+    impl ::std::convert::TryFrom<&str> for PausePolicyXIdempotencyKey {
+        type Error = self::error::ConversionError;
+        fn try_from(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<&::std::string::String> for PausePolicyXIdempotencyKey {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: &::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<::std::string::String> for PausePolicyXIdempotencyKey {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: ::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl<'de> ::serde::Deserialize<'de> for PausePolicyXIdempotencyKey {
         fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
         where
             D: ::serde::Deserializer<'de>,
@@ -72836,6 +74527,22 @@ pub mod types {
     ///      "type": "string",
     ///      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
     ///    },
+    ///    "pausedAt": {
+    ///      "description": "When the policy was paused. Present only when status is paused.",
+    ///      "examples": [
+    ///        "2026-09-29T12:00:00Z"
+    ///      ],
+    ///      "type": "string",
+    ///      "format": "date-time"
+    ///    },
+    ///    "resumeAt": {
+    ///      "description": "When a paused policy resumes automatically. Absent for an indefinite pause.",
+    ///      "examples": [
+    ///        "2026-09-30T12:00:00Z"
+    ///      ],
+    ///      "type": "string",
+    ///      "format": "date-time"
+    ///    },
     ///    "rules": {
     ///      "$ref": "#/components/schemas/PolicyRules"
     ///    },
@@ -72848,6 +74555,25 @@ pub mod types {
     ///      "enum": [
     ///        "project",
     ///        "account"
+    ///      ]
+    ///    },
+    ///    "status": {
+    ///      "description": "The current evaluation status of the policy.",
+    ///      "examples": [
+    ///        "active"
+    ///      ],
+    ///      "type": "string",
+    ///      "enum": [
+    ///        "active",
+    ///        "paused"
+    ///      ],
+    ///      "x-enum-descriptions": [
+    ///        "The policy is evaluated.",
+    ///        "The policy is skipped during evaluation, as if it were not attached."
+    ///      ],
+    ///      "x-enum-varnames": [
+    ///        "PolicyStatusActive",
+    ///        "PolicyStatusPaused"
     ///      ]
     ///    },
     ///    "updatedAt": {
@@ -72872,9 +74598,26 @@ pub mod types {
         pub description: ::std::option::Option<PolicyDescription>,
         ///The unique identifier for the policy.
         pub id: PolicyId,
+        ///When the policy was paused. Present only when status is paused.
+        #[serde(
+            rename = "pausedAt",
+            default,
+            skip_serializing_if = "::std::option::Option::is_none"
+        )]
+        pub paused_at: ::std::option::Option<::chrono::DateTime<::chrono::offset::Utc>>,
+        ///When a paused policy resumes automatically. Absent for an indefinite pause.
+        #[serde(
+            rename = "resumeAt",
+            default,
+            skip_serializing_if = "::std::option::Option::is_none"
+        )]
+        pub resume_at: ::std::option::Option<::chrono::DateTime<::chrono::offset::Utc>>,
         pub rules: PolicyRules,
         ///The scope of the policy. Only one project-level policy can exist at any time.
         pub scope: PolicyScope,
+        ///The current evaluation status of the policy.
+        #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
+        pub status: ::std::option::Option<PolicyStatus>,
         ///The ISO 8601 timestamp at which the Policy was last updated.
         #[serde(rename = "updatedAt")]
         pub updated_at: ::std::string::String,
@@ -73891,6 +75634,95 @@ pub mod types {
         }
     }
     impl ::std::convert::TryFrom<::std::string::String> for PolicySimulationResultReason {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: ::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    ///The current evaluation status of the policy.
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "description": "The current evaluation status of the policy.",
+    ///  "examples": [
+    ///    "active"
+    ///  ],
+    ///  "type": "string",
+    ///  "enum": [
+    ///    "active",
+    ///    "paused"
+    ///  ],
+    ///  "x-enum-descriptions": [
+    ///    "The policy is evaluated.",
+    ///    "The policy is skipped during evaluation, as if it were not attached."
+    ///  ],
+    ///  "x-enum-varnames": [
+    ///    "PolicyStatusActive",
+    ///    "PolicyStatusPaused"
+    ///  ]
+    ///}
+    /// ```
+    /// </details>
+    #[derive(
+        ::serde::Deserialize,
+        ::serde::Serialize,
+        Clone,
+        Copy,
+        Debug,
+        Eq,
+        Hash,
+        Ord,
+        PartialEq,
+        PartialOrd,
+    )]
+    pub enum PolicyStatus {
+        #[serde(rename = "active")]
+        Active,
+        #[serde(rename = "paused")]
+        Paused,
+    }
+    impl ::std::convert::From<&Self> for PolicyStatus {
+        fn from(value: &PolicyStatus) -> Self {
+            value.clone()
+        }
+    }
+    impl ::std::fmt::Display for PolicyStatus {
+        fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+            match *self {
+                Self::Active => f.write_str("active"),
+                Self::Paused => f.write_str("paused"),
+            }
+        }
+    }
+    impl ::std::str::FromStr for PolicyStatus {
+        type Err = self::error::ConversionError;
+        fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            match value {
+                "active" => Ok(Self::Active),
+                "paused" => Ok(Self::Paused),
+                _ => Err("invalid value".into()),
+            }
+        }
+    }
+    impl ::std::convert::TryFrom<&str> for PolicyStatus {
+        type Error = self::error::ConversionError;
+        fn try_from(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<&::std::string::String> for PolicyStatus {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: &::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<::std::string::String> for PolicyStatus {
         type Error = self::error::ConversionError;
         fn try_from(
             value: ::std::string::String,
@@ -76476,6 +78308,332 @@ pub mod types {
             value.parse()
         }
     }
+    ///`RedeemVaultFeesWithEvmAccountAddress`
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "type": "string",
+    ///  "pattern": "^0x[0-9a-fA-F]{40}$"
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    #[serde(transparent)]
+    pub struct RedeemVaultFeesWithEvmAccountAddress(::std::string::String);
+    impl ::std::ops::Deref for RedeemVaultFeesWithEvmAccountAddress {
+        type Target = ::std::string::String;
+        fn deref(&self) -> &::std::string::String {
+            &self.0
+        }
+    }
+    impl ::std::convert::From<RedeemVaultFeesWithEvmAccountAddress> for ::std::string::String {
+        fn from(value: RedeemVaultFeesWithEvmAccountAddress) -> Self {
+            value.0
+        }
+    }
+    impl ::std::convert::From<&RedeemVaultFeesWithEvmAccountAddress>
+        for RedeemVaultFeesWithEvmAccountAddress
+    {
+        fn from(value: &RedeemVaultFeesWithEvmAccountAddress) -> Self {
+            value.clone()
+        }
+    }
+    impl ::std::str::FromStr for RedeemVaultFeesWithEvmAccountAddress {
+        type Err = self::error::ConversionError;
+        fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            static PATTERN: ::std::sync::LazyLock<::regress::Regex> =
+                ::std::sync::LazyLock::new(|| {
+                    ::regress::Regex::new("^0x[0-9a-fA-F]{40}$").unwrap()
+                });
+            if PATTERN.find(value).is_none() {
+                return Err("doesn't match pattern \"^0x[0-9a-fA-F]{40}$\"".into());
+            }
+            Ok(Self(value.to_string()))
+        }
+    }
+    impl ::std::convert::TryFrom<&str> for RedeemVaultFeesWithEvmAccountAddress {
+        type Error = self::error::ConversionError;
+        fn try_from(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<&::std::string::String> for RedeemVaultFeesWithEvmAccountAddress {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: &::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<::std::string::String> for RedeemVaultFeesWithEvmAccountAddress {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: ::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl<'de> ::serde::Deserialize<'de> for RedeemVaultFeesWithEvmAccountAddress {
+        fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+        where
+            D: ::serde::Deserializer<'de>,
+        {
+            ::std::string::String::deserialize(deserializer)?
+                .parse()
+                .map_err(|e: self::error::ConversionError| {
+                    <D::Error as ::serde::de::Error>::custom(e.to_string())
+                })
+        }
+    }
+    ///`RedeemVaultFeesWithEvmAccountXIdempotencyKey`
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "type": "string",
+    ///  "maxLength": 128,
+    ///  "minLength": 1
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    #[serde(transparent)]
+    pub struct RedeemVaultFeesWithEvmAccountXIdempotencyKey(::std::string::String);
+    impl ::std::ops::Deref for RedeemVaultFeesWithEvmAccountXIdempotencyKey {
+        type Target = ::std::string::String;
+        fn deref(&self) -> &::std::string::String {
+            &self.0
+        }
+    }
+    impl ::std::convert::From<RedeemVaultFeesWithEvmAccountXIdempotencyKey> for ::std::string::String {
+        fn from(value: RedeemVaultFeesWithEvmAccountXIdempotencyKey) -> Self {
+            value.0
+        }
+    }
+    impl ::std::convert::From<&RedeemVaultFeesWithEvmAccountXIdempotencyKey>
+        for RedeemVaultFeesWithEvmAccountXIdempotencyKey
+    {
+        fn from(value: &RedeemVaultFeesWithEvmAccountXIdempotencyKey) -> Self {
+            value.clone()
+        }
+    }
+    impl ::std::str::FromStr for RedeemVaultFeesWithEvmAccountXIdempotencyKey {
+        type Err = self::error::ConversionError;
+        fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            if value.chars().count() > 128usize {
+                return Err("longer than 128 characters".into());
+            }
+            if value.chars().count() < 1usize {
+                return Err("shorter than 1 characters".into());
+            }
+            Ok(Self(value.to_string()))
+        }
+    }
+    impl ::std::convert::TryFrom<&str> for RedeemVaultFeesWithEvmAccountXIdempotencyKey {
+        type Error = self::error::ConversionError;
+        fn try_from(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<&::std::string::String>
+        for RedeemVaultFeesWithEvmAccountXIdempotencyKey
+    {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: &::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<::std::string::String>
+        for RedeemVaultFeesWithEvmAccountXIdempotencyKey
+    {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: ::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl<'de> ::serde::Deserialize<'de> for RedeemVaultFeesWithEvmAccountXIdempotencyKey {
+        fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+        where
+            D: ::serde::Deserializer<'de>,
+        {
+            ::std::string::String::deserialize(deserializer)?
+                .parse()
+                .map_err(|e: self::error::ConversionError| {
+                    <D::Error as ::serde::de::Error>::custom(e.to_string())
+                })
+        }
+    }
+    ///`RedeemVaultFeesWithEvmSmartAccountAddress`
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "type": "string",
+    ///  "pattern": "^0x[0-9a-fA-F]{40}$"
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    #[serde(transparent)]
+    pub struct RedeemVaultFeesWithEvmSmartAccountAddress(::std::string::String);
+    impl ::std::ops::Deref for RedeemVaultFeesWithEvmSmartAccountAddress {
+        type Target = ::std::string::String;
+        fn deref(&self) -> &::std::string::String {
+            &self.0
+        }
+    }
+    impl ::std::convert::From<RedeemVaultFeesWithEvmSmartAccountAddress> for ::std::string::String {
+        fn from(value: RedeemVaultFeesWithEvmSmartAccountAddress) -> Self {
+            value.0
+        }
+    }
+    impl ::std::convert::From<&RedeemVaultFeesWithEvmSmartAccountAddress>
+        for RedeemVaultFeesWithEvmSmartAccountAddress
+    {
+        fn from(value: &RedeemVaultFeesWithEvmSmartAccountAddress) -> Self {
+            value.clone()
+        }
+    }
+    impl ::std::str::FromStr for RedeemVaultFeesWithEvmSmartAccountAddress {
+        type Err = self::error::ConversionError;
+        fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            static PATTERN: ::std::sync::LazyLock<::regress::Regex> =
+                ::std::sync::LazyLock::new(|| {
+                    ::regress::Regex::new("^0x[0-9a-fA-F]{40}$").unwrap()
+                });
+            if PATTERN.find(value).is_none() {
+                return Err("doesn't match pattern \"^0x[0-9a-fA-F]{40}$\"".into());
+            }
+            Ok(Self(value.to_string()))
+        }
+    }
+    impl ::std::convert::TryFrom<&str> for RedeemVaultFeesWithEvmSmartAccountAddress {
+        type Error = self::error::ConversionError;
+        fn try_from(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<&::std::string::String> for RedeemVaultFeesWithEvmSmartAccountAddress {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: &::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<::std::string::String> for RedeemVaultFeesWithEvmSmartAccountAddress {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: ::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl<'de> ::serde::Deserialize<'de> for RedeemVaultFeesWithEvmSmartAccountAddress {
+        fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+        where
+            D: ::serde::Deserializer<'de>,
+        {
+            ::std::string::String::deserialize(deserializer)?
+                .parse()
+                .map_err(|e: self::error::ConversionError| {
+                    <D::Error as ::serde::de::Error>::custom(e.to_string())
+                })
+        }
+    }
+    ///`RedeemVaultFeesWithEvmSmartAccountXIdempotencyKey`
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "type": "string",
+    ///  "maxLength": 128,
+    ///  "minLength": 1
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    #[serde(transparent)]
+    pub struct RedeemVaultFeesWithEvmSmartAccountXIdempotencyKey(::std::string::String);
+    impl ::std::ops::Deref for RedeemVaultFeesWithEvmSmartAccountXIdempotencyKey {
+        type Target = ::std::string::String;
+        fn deref(&self) -> &::std::string::String {
+            &self.0
+        }
+    }
+    impl ::std::convert::From<RedeemVaultFeesWithEvmSmartAccountXIdempotencyKey>
+        for ::std::string::String
+    {
+        fn from(value: RedeemVaultFeesWithEvmSmartAccountXIdempotencyKey) -> Self {
+            value.0
+        }
+    }
+    impl ::std::convert::From<&RedeemVaultFeesWithEvmSmartAccountXIdempotencyKey>
+        for RedeemVaultFeesWithEvmSmartAccountXIdempotencyKey
+    {
+        fn from(value: &RedeemVaultFeesWithEvmSmartAccountXIdempotencyKey) -> Self {
+            value.clone()
+        }
+    }
+    impl ::std::str::FromStr for RedeemVaultFeesWithEvmSmartAccountXIdempotencyKey {
+        type Err = self::error::ConversionError;
+        fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            if value.chars().count() > 128usize {
+                return Err("longer than 128 characters".into());
+            }
+            if value.chars().count() < 1usize {
+                return Err("shorter than 1 characters".into());
+            }
+            Ok(Self(value.to_string()))
+        }
+    }
+    impl ::std::convert::TryFrom<&str> for RedeemVaultFeesWithEvmSmartAccountXIdempotencyKey {
+        type Error = self::error::ConversionError;
+        fn try_from(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<&::std::string::String>
+        for RedeemVaultFeesWithEvmSmartAccountXIdempotencyKey
+    {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: &::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<::std::string::String>
+        for RedeemVaultFeesWithEvmSmartAccountXIdempotencyKey
+    {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: ::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl<'de> ::serde::Deserialize<'de> for RedeemVaultFeesWithEvmSmartAccountXIdempotencyKey {
+        fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+        where
+            D: ::serde::Deserializer<'de>,
+        {
+            ::std::string::String::deserialize(deserializer)?
+                .parse()
+                .map_err(|e: self::error::ConversionError| {
+                    <D::Error as ::serde::de::Error>::custom(e.to_string())
+                })
+        }
+    }
     ///A return of previously captured funds to the payer. Multiple partial refunds are allowed up to the total captured amount.
     ///
     /// <details><summary>JSON schema</summary>
@@ -77321,7 +79479,7 @@ pub mod types {
     #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
     pub struct RequestEvmFaucetResponse {
         /**The hash of the transaction that requested the funds.
-         **Note:** In rare cases, when gas conditions are unusually high, the transaction may not confirm, and the system may issue a replacement transaction to complete the faucet request. In these rare cases, the `transactionHash` will be out of sync with the actual faucet transaction that was confirmed onchain.*/
+        **Note:** In rare cases, when gas conditions are unusually high, the transaction may not confirm, and the system may issue a replacement transaction to complete the faucet request. In these rare cases, the `transactionHash` will be out of sync with the actual faucet transaction that was confirmed onchain.*/
         #[serde(rename = "transactionHash")]
         pub transaction_hash: ::std::string::String,
     }
@@ -78119,6 +80277,167 @@ pub mod types {
     {
         fn from(value: ::std::collections::HashMap<::std::string::String, Requirement>) -> Self {
             Self(value)
+        }
+    }
+    ///`ResumePolicyPolicyId`
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "type": "string",
+    ///  "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    #[serde(transparent)]
+    pub struct ResumePolicyPolicyId(::std::string::String);
+    impl ::std::ops::Deref for ResumePolicyPolicyId {
+        type Target = ::std::string::String;
+        fn deref(&self) -> &::std::string::String {
+            &self.0
+        }
+    }
+    impl ::std::convert::From<ResumePolicyPolicyId> for ::std::string::String {
+        fn from(value: ResumePolicyPolicyId) -> Self {
+            value.0
+        }
+    }
+    impl ::std::convert::From<&ResumePolicyPolicyId> for ResumePolicyPolicyId {
+        fn from(value: &ResumePolicyPolicyId) -> Self {
+            value.clone()
+        }
+    }
+    impl ::std::str::FromStr for ResumePolicyPolicyId {
+        type Err = self::error::ConversionError;
+        fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            static PATTERN: ::std::sync::LazyLock<::regress::Regex> = ::std::sync::LazyLock::new(
+                || {
+                    ::regress::Regex::new(
+                        "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+                    )
+                    .unwrap()
+                },
+            );
+            if PATTERN.find(value).is_none() {
+                return Err(
+                    "doesn't match pattern \"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$\""
+                        .into(),
+                );
+            }
+            Ok(Self(value.to_string()))
+        }
+    }
+    impl ::std::convert::TryFrom<&str> for ResumePolicyPolicyId {
+        type Error = self::error::ConversionError;
+        fn try_from(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<&::std::string::String> for ResumePolicyPolicyId {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: &::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<::std::string::String> for ResumePolicyPolicyId {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: ::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl<'de> ::serde::Deserialize<'de> for ResumePolicyPolicyId {
+        fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+        where
+            D: ::serde::Deserializer<'de>,
+        {
+            ::std::string::String::deserialize(deserializer)?
+                .parse()
+                .map_err(|e: self::error::ConversionError| {
+                    <D::Error as ::serde::de::Error>::custom(e.to_string())
+                })
+        }
+    }
+    ///`ResumePolicyXIdempotencyKey`
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "type": "string",
+    ///  "maxLength": 128,
+    ///  "minLength": 1
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    #[serde(transparent)]
+    pub struct ResumePolicyXIdempotencyKey(::std::string::String);
+    impl ::std::ops::Deref for ResumePolicyXIdempotencyKey {
+        type Target = ::std::string::String;
+        fn deref(&self) -> &::std::string::String {
+            &self.0
+        }
+    }
+    impl ::std::convert::From<ResumePolicyXIdempotencyKey> for ::std::string::String {
+        fn from(value: ResumePolicyXIdempotencyKey) -> Self {
+            value.0
+        }
+    }
+    impl ::std::convert::From<&ResumePolicyXIdempotencyKey> for ResumePolicyXIdempotencyKey {
+        fn from(value: &ResumePolicyXIdempotencyKey) -> Self {
+            value.clone()
+        }
+    }
+    impl ::std::str::FromStr for ResumePolicyXIdempotencyKey {
+        type Err = self::error::ConversionError;
+        fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            if value.chars().count() > 128usize {
+                return Err("longer than 128 characters".into());
+            }
+            if value.chars().count() < 1usize {
+                return Err("shorter than 1 characters".into());
+            }
+            Ok(Self(value.to_string()))
+        }
+    }
+    impl ::std::convert::TryFrom<&str> for ResumePolicyXIdempotencyKey {
+        type Error = self::error::ConversionError;
+        fn try_from(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<&::std::string::String> for ResumePolicyXIdempotencyKey {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: &::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<::std::string::String> for ResumePolicyXIdempotencyKey {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: ::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl<'de> ::serde::Deserialize<'de> for ResumePolicyXIdempotencyKey {
+        fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+        where
+            D: ::serde::Deserializer<'de>,
+        {
+            ::std::string::String::deserialize(deserializer)?
+                .parse()
+                .map_err(|e: self::error::ConversionError| {
+                    <D::Error as ::serde::de::Error>::custom(e.to_string())
+                })
         }
     }
     /**A record of a wallet revocation: the customer removing the mandate's spending allowance on-chain (see `onchainTransactions`). While it is confirming, the mandate's `status` is `revocation_pending`; on success it becomes `revocation_succeeded` and the mandate's `revokedAt` is set, and on failure it becomes `revocation_failed`. This applies regardless of whether the mandate was previously canceled: a revocation on an already-canceled mandate still moves `status` through the `revocation_*` values and sets `revokedAt`.
@@ -105194,6 +107513,226 @@ pub mod types {
             self.0.fmt(f)
         }
     }
+    ///`SmartAccountVaultRedeemFeesRequest`
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "allOf": [
+    ///    {
+    ///      "$ref": "#/components/schemas/VaultRedeemFeesRequest"
+    ///    },
+    ///    {
+    ///      "description": "A request to redeem the fee shares held by the vault's fee recipient EVM Smart Account for the vault's underlying asset (e.g. USDC). The share approval and redemption are batched into a single user operation.",
+    ///      "examples": [
+    ///        {
+    ///          "useCdpPaymaster": true,
+    ///          "vaultId": "vault_019f5f10-096a-7a23-86df-f479650d813f"
+    ///        }
+    ///      ],
+    ///      "type": "object",
+    ///      "properties": {
+    ///        "paymasterContext": {
+    ///          "$ref": "#/components/schemas/PaymasterContext"
+    ///        },
+    ///        "paymasterUrl": {
+    ///          "description": "Optional custom Paymaster URL to use for gas sponsorship. This allows you to use your own Paymaster service instead of CDP's Paymaster. Cannot be used together with `useCdpPaymaster`.",
+    ///          "examples": [
+    ///            "https://api.developer.coinbase.com/rpc/v1/base/AbCdEf123456"
+    ///          ],
+    ///          "allOf": [
+    ///            {
+    ///              "$ref": "#/components/schemas/Url"
+    ///            }
+    ///          ]
+    ///        },
+    ///        "useCdpPaymaster": {
+    ///          "description": "Whether to use CDP Paymaster to sponsor gas fees. When true, the user operation gas will be paid by the Paymaster, allowing the account to redeem fees without holding native gas tokens. Cannot be used together with `paymasterUrl`.",
+    ///          "examples": [
+    ///            true
+    ///          ],
+    ///          "type": "boolean"
+    ///        }
+    ///      }
+    ///    }
+    ///  ]
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+    pub struct SmartAccountVaultRedeemFeesRequest {
+        ///The maximum share-price movement tolerated between calldata construction and onchain execution, in basis points. Defaults to 100 bps (1%) when omitted.
+        #[serde(
+            rename = "maxSlippageBps",
+            default,
+            skip_serializing_if = "::std::option::Option::is_none"
+        )]
+        pub max_slippage_bps: ::std::option::Option<i64>,
+        #[serde(
+            rename = "paymasterContext",
+            default,
+            skip_serializing_if = "::std::option::Option::is_none"
+        )]
+        pub paymaster_context: ::std::option::Option<PaymasterContext>,
+        ///Optional custom Paymaster URL to use for gas sponsorship. This allows you to use your own Paymaster service instead of CDP's Paymaster. Cannot be used together with `useCdpPaymaster`.
+        #[serde(
+            rename = "paymasterUrl",
+            default,
+            skip_serializing_if = "::std::option::Option::is_none"
+        )]
+        pub paymaster_url: ::std::option::Option<Url>,
+        ///Whether to use CDP Paymaster to sponsor gas fees. When true, the user operation gas will be paid by the Paymaster, allowing the account to redeem fees without holding native gas tokens. Cannot be used together with `paymasterUrl`.
+        #[serde(
+            rename = "useCdpPaymaster",
+            default,
+            skip_serializing_if = "::std::option::Option::is_none"
+        )]
+        pub use_cdp_paymaster: ::std::option::Option<bool>,
+        #[serde(rename = "vaultId")]
+        pub vault_id: VaultId,
+    }
+    impl ::std::convert::From<&SmartAccountVaultRedeemFeesRequest>
+        for SmartAccountVaultRedeemFeesRequest
+    {
+        fn from(value: &SmartAccountVaultRedeemFeesRequest) -> Self {
+            value.clone()
+        }
+    }
+    impl SmartAccountVaultRedeemFeesRequest {
+        pub fn builder() -> builder::SmartAccountVaultRedeemFeesRequest {
+            Default::default()
+        }
+    }
+    ///The result of a vault fee redemption from an EVM Smart Account after broadcast.
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "description": "The result of a vault fee redemption from an EVM Smart Account after broadcast.",
+    ///  "type": "object",
+    ///  "required": [
+    ///    "userOpHash"
+    ///  ],
+    ///  "properties": {
+    ///    "userOpHash": {
+    ///      "description": "The hash of the user operation executing the fee redemption, as a 0x-prefixed hex string. Poll `getUserOperation` for the operation's status.",
+    ///      "examples": [
+    ///        "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+    ///      ],
+    ///      "type": "string",
+    ///      "pattern": "^0x[0-9a-fA-F]{64}$"
+    ///    }
+    ///  }
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+    pub struct SmartAccountVaultRedeemFeesResponse {
+        ///The hash of the user operation executing the fee redemption, as a 0x-prefixed hex string. Poll `getUserOperation` for the operation's status.
+        #[serde(rename = "userOpHash")]
+        pub user_op_hash: SmartAccountVaultRedeemFeesResponseUserOpHash,
+    }
+    impl ::std::convert::From<&SmartAccountVaultRedeemFeesResponse>
+        for SmartAccountVaultRedeemFeesResponse
+    {
+        fn from(value: &SmartAccountVaultRedeemFeesResponse) -> Self {
+            value.clone()
+        }
+    }
+    impl SmartAccountVaultRedeemFeesResponse {
+        pub fn builder() -> builder::SmartAccountVaultRedeemFeesResponse {
+            Default::default()
+        }
+    }
+    ///The hash of the user operation executing the fee redemption, as a 0x-prefixed hex string. Poll `getUserOperation` for the operation's status.
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "description": "The hash of the user operation executing the fee redemption, as a 0x-prefixed hex string. Poll `getUserOperation` for the operation's status.",
+    ///  "examples": [
+    ///    "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+    ///  ],
+    ///  "type": "string",
+    ///  "pattern": "^0x[0-9a-fA-F]{64}$"
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    #[serde(transparent)]
+    pub struct SmartAccountVaultRedeemFeesResponseUserOpHash(::std::string::String);
+    impl ::std::ops::Deref for SmartAccountVaultRedeemFeesResponseUserOpHash {
+        type Target = ::std::string::String;
+        fn deref(&self) -> &::std::string::String {
+            &self.0
+        }
+    }
+    impl ::std::convert::From<SmartAccountVaultRedeemFeesResponseUserOpHash> for ::std::string::String {
+        fn from(value: SmartAccountVaultRedeemFeesResponseUserOpHash) -> Self {
+            value.0
+        }
+    }
+    impl ::std::convert::From<&SmartAccountVaultRedeemFeesResponseUserOpHash>
+        for SmartAccountVaultRedeemFeesResponseUserOpHash
+    {
+        fn from(value: &SmartAccountVaultRedeemFeesResponseUserOpHash) -> Self {
+            value.clone()
+        }
+    }
+    impl ::std::str::FromStr for SmartAccountVaultRedeemFeesResponseUserOpHash {
+        type Err = self::error::ConversionError;
+        fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            static PATTERN: ::std::sync::LazyLock<::regress::Regex> =
+                ::std::sync::LazyLock::new(|| {
+                    ::regress::Regex::new("^0x[0-9a-fA-F]{64}$").unwrap()
+                });
+            if PATTERN.find(value).is_none() {
+                return Err("doesn't match pattern \"^0x[0-9a-fA-F]{64}$\"".into());
+            }
+            Ok(Self(value.to_string()))
+        }
+    }
+    impl ::std::convert::TryFrom<&str> for SmartAccountVaultRedeemFeesResponseUserOpHash {
+        type Error = self::error::ConversionError;
+        fn try_from(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<&::std::string::String>
+        for SmartAccountVaultRedeemFeesResponseUserOpHash
+    {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: &::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<::std::string::String>
+        for SmartAccountVaultRedeemFeesResponseUserOpHash
+    {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: ::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl<'de> ::serde::Deserialize<'de> for SmartAccountVaultRedeemFeesResponseUserOpHash {
+        fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+        where
+            D: ::serde::Deserializer<'de>,
+        {
+            ::std::string::String::deserialize(deserializer)?
+                .parse()
+                .map_err(|e: self::error::ConversionError| {
+                    <D::Error as ::serde::de::Error>::custom(e.to_string())
+                })
+        }
+    }
     ///Information about an end user who authenticates using a one-time password sent to their phone number via SMS.
     ///
     /// <details><summary>JSON schema</summary>
@@ -118337,6 +120876,604 @@ pub mod types {
             Default::default()
         }
     }
+    ///A vault created on top of a catalog vault.
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "description": "A vault created on top of a catalog vault.",
+    ///  "type": "object",
+    ///  "required": [
+    ///    "address",
+    ///    "catalogVaultId",
+    ///    "createdAt",
+    ///    "feeRecipientAddress",
+    ///    "network",
+    ///    "performanceFeeBps",
+    ///    "status",
+    ///    "underlyingAsset",
+    ///    "vaultId"
+    ///  ],
+    ///  "properties": {
+    ///    "address": {
+    ///      "description": "The 0x-prefixed onchain address of the vault. The address is deterministic and known at creation; the vault deploys at this address once the deployment user operation is included onchain.",
+    ///      "examples": [
+    ///        "0x15966F1582CAEFB56CDB4Fba1dC622E41F2Ad33D"
+    ///      ],
+    ///      "type": "string",
+    ///      "pattern": "^0x[a-fA-F0-9]{40}$"
+    ///    },
+    ///    "catalogVaultId": {
+    ///      "$ref": "#/components/schemas/CatalogVaultId"
+    ///    },
+    ///    "createdAt": {
+    ///      "description": "The time the vault was created, in RFC 3339 format.",
+    ///      "examples": [
+    ///        "2026-09-15T15:39:37Z"
+    ///      ],
+    ///      "type": "string",
+    ///      "format": "date-time"
+    ///    },
+    ///    "feeRecipientAddress": {
+    ///      "description": "The 0x-prefixed address that receives the vault's performance fees.",
+    ///      "examples": [
+    ///        "0x742d35Cc6634C0532925a3b844Bc454e4438f44e"
+    ///      ],
+    ///      "type": "string",
+    ///      "pattern": "^0x[a-fA-F0-9]{40}$"
+    ///    },
+    ///    "metrics": {
+    ///      "description": "The vault's current metrics. Only present once at least one metrics snapshot has been observed for the vault.",
+    ///      "examples": [
+    ///        {
+    ///          "apyBps": 500,
+    ///          "apyUpdatedAt": "2026-09-22T00:00:00Z",
+    ///          "tvl": "1000",
+    ///          "tvlUpdatedAt": "2026-09-22T00:00:00Z"
+    ///        }
+    ///      ],
+    ///      "allOf": [
+    ///        {
+    ///          "$ref": "#/components/schemas/VaultMetrics"
+    ///        }
+    ///      ]
+    ///    },
+    ///    "network": {
+    ///      "$ref": "#/components/schemas/LendNetwork"
+    ///    },
+    ///    "performanceFeeBps": {
+    ///      "description": "Your performance fee, in basis points. CDP charges an additional fee equal to currently 10% (1000 bps) of your fee.",
+    ///      "examples": [
+    ///        2000
+    ///      ],
+    ///      "type": "integer",
+    ///      "maximum": 5000.0,
+    ///      "minimum": 0.0
+    ///    },
+    ///    "status": {
+    ///      "$ref": "#/components/schemas/VaultStatus"
+    ///    },
+    ///    "underlyingAsset": {
+    ///      "description": "The symbol of the vault's underlying asset.",
+    ///      "examples": [
+    ///        "usdc"
+    ///      ],
+    ///      "allOf": [
+    ///        {
+    ///          "$ref": "#/components/schemas/Asset"
+    ///        }
+    ///      ]
+    ///    },
+    ///    "vaultId": {
+    ///      "$ref": "#/components/schemas/VaultId"
+    ///    }
+    ///  }
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+    pub struct Vault {
+        ///The 0x-prefixed onchain address of the vault. The address is deterministic and known at creation; the vault deploys at this address once the deployment user operation is included onchain.
+        pub address: VaultAddress,
+        #[serde(rename = "catalogVaultId")]
+        pub catalog_vault_id: CatalogVaultId,
+        ///The time the vault was created, in RFC 3339 format.
+        #[serde(rename = "createdAt")]
+        pub created_at: ::chrono::DateTime<::chrono::offset::Utc>,
+        ///The 0x-prefixed address that receives the vault's performance fees.
+        #[serde(rename = "feeRecipientAddress")]
+        pub fee_recipient_address: VaultFeeRecipientAddress,
+        ///The vault's current metrics. Only present once at least one metrics snapshot has been observed for the vault.
+        #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
+        pub metrics: ::std::option::Option<VaultMetrics>,
+        pub network: LendNetwork,
+        ///Your performance fee, in basis points. CDP charges an additional fee equal to currently 10% (1000 bps) of your fee.
+        #[serde(rename = "performanceFeeBps")]
+        pub performance_fee_bps: i64,
+        pub status: VaultStatus,
+        ///The symbol of the vault's underlying asset.
+        #[serde(rename = "underlyingAsset")]
+        pub underlying_asset: Asset,
+        #[serde(rename = "vaultId")]
+        pub vault_id: VaultId,
+    }
+    impl ::std::convert::From<&Vault> for Vault {
+        fn from(value: &Vault) -> Self {
+            value.clone()
+        }
+    }
+    impl Vault {
+        pub fn builder() -> builder::Vault {
+            Default::default()
+        }
+    }
+    ///The 0x-prefixed onchain address of the vault. The address is deterministic and known at creation; the vault deploys at this address once the deployment user operation is included onchain.
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "description": "The 0x-prefixed onchain address of the vault. The address is deterministic and known at creation; the vault deploys at this address once the deployment user operation is included onchain.",
+    ///  "examples": [
+    ///    "0x15966F1582CAEFB56CDB4Fba1dC622E41F2Ad33D"
+    ///  ],
+    ///  "type": "string",
+    ///  "pattern": "^0x[a-fA-F0-9]{40}$"
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    #[serde(transparent)]
+    pub struct VaultAddress(::std::string::String);
+    impl ::std::ops::Deref for VaultAddress {
+        type Target = ::std::string::String;
+        fn deref(&self) -> &::std::string::String {
+            &self.0
+        }
+    }
+    impl ::std::convert::From<VaultAddress> for ::std::string::String {
+        fn from(value: VaultAddress) -> Self {
+            value.0
+        }
+    }
+    impl ::std::convert::From<&VaultAddress> for VaultAddress {
+        fn from(value: &VaultAddress) -> Self {
+            value.clone()
+        }
+    }
+    impl ::std::str::FromStr for VaultAddress {
+        type Err = self::error::ConversionError;
+        fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            static PATTERN: ::std::sync::LazyLock<::regress::Regex> =
+                ::std::sync::LazyLock::new(|| {
+                    ::regress::Regex::new("^0x[a-fA-F0-9]{40}$").unwrap()
+                });
+            if PATTERN.find(value).is_none() {
+                return Err("doesn't match pattern \"^0x[a-fA-F0-9]{40}$\"".into());
+            }
+            Ok(Self(value.to_string()))
+        }
+    }
+    impl ::std::convert::TryFrom<&str> for VaultAddress {
+        type Error = self::error::ConversionError;
+        fn try_from(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<&::std::string::String> for VaultAddress {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: &::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<::std::string::String> for VaultAddress {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: ::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl<'de> ::serde::Deserialize<'de> for VaultAddress {
+        fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+        where
+            D: ::serde::Deserializer<'de>,
+        {
+            ::std::string::String::deserialize(deserializer)?
+                .parse()
+                .map_err(|e: self::error::ConversionError| {
+                    <D::Error as ::serde::de::Error>::custom(e.to_string())
+                })
+        }
+    }
+    ///The 0x-prefixed address that receives the vault's performance fees.
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "description": "The 0x-prefixed address that receives the vault's performance fees.",
+    ///  "examples": [
+    ///    "0x742d35Cc6634C0532925a3b844Bc454e4438f44e"
+    ///  ],
+    ///  "type": "string",
+    ///  "pattern": "^0x[a-fA-F0-9]{40}$"
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    #[serde(transparent)]
+    pub struct VaultFeeRecipientAddress(::std::string::String);
+    impl ::std::ops::Deref for VaultFeeRecipientAddress {
+        type Target = ::std::string::String;
+        fn deref(&self) -> &::std::string::String {
+            &self.0
+        }
+    }
+    impl ::std::convert::From<VaultFeeRecipientAddress> for ::std::string::String {
+        fn from(value: VaultFeeRecipientAddress) -> Self {
+            value.0
+        }
+    }
+    impl ::std::convert::From<&VaultFeeRecipientAddress> for VaultFeeRecipientAddress {
+        fn from(value: &VaultFeeRecipientAddress) -> Self {
+            value.clone()
+        }
+    }
+    impl ::std::str::FromStr for VaultFeeRecipientAddress {
+        type Err = self::error::ConversionError;
+        fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            static PATTERN: ::std::sync::LazyLock<::regress::Regex> =
+                ::std::sync::LazyLock::new(|| {
+                    ::regress::Regex::new("^0x[a-fA-F0-9]{40}$").unwrap()
+                });
+            if PATTERN.find(value).is_none() {
+                return Err("doesn't match pattern \"^0x[a-fA-F0-9]{40}$\"".into());
+            }
+            Ok(Self(value.to_string()))
+        }
+    }
+    impl ::std::convert::TryFrom<&str> for VaultFeeRecipientAddress {
+        type Error = self::error::ConversionError;
+        fn try_from(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<&::std::string::String> for VaultFeeRecipientAddress {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: &::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<::std::string::String> for VaultFeeRecipientAddress {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: ::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl<'de> ::serde::Deserialize<'de> for VaultFeeRecipientAddress {
+        fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+        where
+            D: ::serde::Deserializer<'de>,
+        {
+            ::std::string::String::deserialize(deserializer)?
+                .parse()
+                .map_err(|e: self::error::ConversionError| {
+                    <D::Error as ::serde::de::Error>::custom(e.to_string())
+                })
+        }
+    }
+    ///The globally unique ID of the vault, which is a UUID prefixed with the string `vault_`.
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "description": "The globally unique ID of the vault, which is a UUID prefixed with the string `vault_`.",
+    ///  "examples": [
+    ///    "vault_019f5f10-096a-7a23-86df-f479650d813f"
+    ///  ],
+    ///  "type": "string",
+    ///  "pattern": "^vault_[a-f0-9-]{36}$"
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Serialize, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    #[serde(transparent)]
+    pub struct VaultId(::std::string::String);
+    impl ::std::ops::Deref for VaultId {
+        type Target = ::std::string::String;
+        fn deref(&self) -> &::std::string::String {
+            &self.0
+        }
+    }
+    impl ::std::convert::From<VaultId> for ::std::string::String {
+        fn from(value: VaultId) -> Self {
+            value.0
+        }
+    }
+    impl ::std::convert::From<&VaultId> for VaultId {
+        fn from(value: &VaultId) -> Self {
+            value.clone()
+        }
+    }
+    impl ::std::str::FromStr for VaultId {
+        type Err = self::error::ConversionError;
+        fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            static PATTERN: ::std::sync::LazyLock<::regress::Regex> =
+                ::std::sync::LazyLock::new(|| {
+                    ::regress::Regex::new("^vault_[a-f0-9-]{36}$").unwrap()
+                });
+            if PATTERN.find(value).is_none() {
+                return Err("doesn't match pattern \"^vault_[a-f0-9-]{36}$\"".into());
+            }
+            Ok(Self(value.to_string()))
+        }
+    }
+    impl ::std::convert::TryFrom<&str> for VaultId {
+        type Error = self::error::ConversionError;
+        fn try_from(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<&::std::string::String> for VaultId {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: &::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<::std::string::String> for VaultId {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: ::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl<'de> ::serde::Deserialize<'de> for VaultId {
+        fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+        where
+            D: ::serde::Deserializer<'de>,
+        {
+            ::std::string::String::deserialize(deserializer)?
+                .parse()
+                .map_err(|e: self::error::ConversionError| {
+                    <D::Error as ::serde::de::Error>::custom(e.to_string())
+                })
+        }
+    }
+    ///The current performance metrics of a vault.
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "description": "The current performance metrics of a vault.",
+    ///  "type": "object",
+    ///  "allOf": [
+    ///    {
+    ///      "$ref": "#/components/schemas/ApyMetrics"
+    ///    },
+    ///    {
+    ///      "type": "object",
+    ///      "properties": {
+    ///        "tvl": {
+    ///          "description": "The total value locked in the vault, equivalent to the amount of funds deposited. It is expressed as a decimal string in standard unit denomination of the underlying asset. For example, `1000` equates to 1000 USDC. Only present once a TVL snapshot has been observed for the vault.",
+    ///          "examples": [
+    ///            "1000"
+    ///          ],
+    ///          "allOf": [
+    ///            {
+    ///              "$ref": "#/components/schemas/NonNegativeDecimal"
+    ///            }
+    ///          ]
+    ///        },
+    ///        "tvlUpdatedAt": {
+    ///          "description": "The time the TVL metrics were last updated, in RFC 3339 format. Only present when `tvl` is present.",
+    ///          "examples": [
+    ///            "2026-09-22T00:00:00Z"
+    ///          ],
+    ///          "type": "string",
+    ///          "format": "date-time"
+    ///        }
+    ///      }
+    ///    }
+    ///  ]
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+    pub struct VaultMetrics {
+        ///The trailing 30-day net APY, in basis points, after all applicable performance fees. For example, `500` equates to 5%. Only present once sufficient history has been observed.
+        #[serde(
+            rename = "apyBps",
+            default,
+            skip_serializing_if = "::std::option::Option::is_none"
+        )]
+        pub apy_bps: ::std::option::Option<i64>,
+        ///The time the APY metrics were last updated, in RFC 3339 format. Only present when `apyBps` is present.
+        #[serde(
+            rename = "apyUpdatedAt",
+            default,
+            skip_serializing_if = "::std::option::Option::is_none"
+        )]
+        pub apy_updated_at: ::std::option::Option<::chrono::DateTime<::chrono::offset::Utc>>,
+        ///The total value locked in the vault, equivalent to the amount of funds deposited. It is expressed as a decimal string in standard unit denomination of the underlying asset. For example, `1000` equates to 1000 USDC. Only present once a TVL snapshot has been observed for the vault.
+        #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
+        pub tvl: ::std::option::Option<NonNegativeDecimal>,
+        ///The time the TVL metrics were last updated, in RFC 3339 format. Only present when `tvl` is present.
+        #[serde(
+            rename = "tvlUpdatedAt",
+            default,
+            skip_serializing_if = "::std::option::Option::is_none"
+        )]
+        pub tvl_updated_at: ::std::option::Option<::chrono::DateTime<::chrono::offset::Utc>>,
+    }
+    impl ::std::convert::From<&VaultMetrics> for VaultMetrics {
+        fn from(value: &VaultMetrics) -> Self {
+            value.clone()
+        }
+    }
+    impl ::std::default::Default for VaultMetrics {
+        fn default() -> Self {
+            Self {
+                apy_bps: Default::default(),
+                apy_updated_at: Default::default(),
+                tvl: Default::default(),
+                tvl_updated_at: Default::default(),
+            }
+        }
+    }
+    impl VaultMetrics {
+        pub fn builder() -> builder::VaultMetrics {
+            Default::default()
+        }
+    }
+    ///Fields shared by vault fee redemption requests. Composed into `EoaVaultRedeemFeesRequest` and `SmartAccountVaultRedeemFeesRequest`, which add their account-specific fields on top.
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "description": "Fields shared by vault fee redemption requests. Composed into `EoaVaultRedeemFeesRequest` and `SmartAccountVaultRedeemFeesRequest`, which add their account-specific fields on top.",
+    ///  "type": "object",
+    ///  "required": [
+    ///    "vaultId"
+    ///  ],
+    ///  "properties": {
+    ///    "maxSlippageBps": {
+    ///      "description": "The maximum share-price movement tolerated between calldata construction and onchain execution, in basis points. Defaults to 100 bps (1%) when omitted.",
+    ///      "examples": [
+    ///        100
+    ///      ],
+    ///      "type": "integer",
+    ///      "maximum": 9999.0,
+    ///      "minimum": 0.0
+    ///    },
+    ///    "vaultId": {
+    ///      "$ref": "#/components/schemas/VaultId"
+    ///    }
+    ///  }
+    ///}
+    /// ```
+    /// </details>
+    #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+    pub struct VaultRedeemFeesRequest {
+        ///The maximum share-price movement tolerated between calldata construction and onchain execution, in basis points. Defaults to 100 bps (1%) when omitted.
+        #[serde(
+            rename = "maxSlippageBps",
+            default,
+            skip_serializing_if = "::std::option::Option::is_none"
+        )]
+        pub max_slippage_bps: ::std::option::Option<i64>,
+        #[serde(rename = "vaultId")]
+        pub vault_id: VaultId,
+    }
+    impl ::std::convert::From<&VaultRedeemFeesRequest> for VaultRedeemFeesRequest {
+        fn from(value: &VaultRedeemFeesRequest) -> Self {
+            value.clone()
+        }
+    }
+    impl VaultRedeemFeesRequest {
+        pub fn builder() -> builder::VaultRedeemFeesRequest {
+            Default::default()
+        }
+    }
+    ///The lifecycle status of the vault. A vault is `pending` from creation until its deployment user operation succeeds onchain, then `active`. If the deployment user operation fails onchain, then the status is `failed`.
+    ///
+    /// <details><summary>JSON schema</summary>
+    ///
+    /// ```json
+    ///{
+    ///  "description": "The lifecycle status of the vault. A vault is `pending` from creation until its deployment user operation succeeds onchain, then `active`. If the deployment user operation fails onchain, then the status is `failed`.",
+    ///  "examples": [
+    ///    "pending"
+    ///  ],
+    ///  "type": "string",
+    ///  "enum": [
+    ///    "pending",
+    ///    "active",
+    ///    "failed"
+    ///  ]
+    ///}
+    /// ```
+    /// </details>
+    #[derive(
+        ::serde::Deserialize,
+        ::serde::Serialize,
+        Clone,
+        Copy,
+        Debug,
+        Eq,
+        Hash,
+        Ord,
+        PartialEq,
+        PartialOrd,
+    )]
+    pub enum VaultStatus {
+        #[serde(rename = "pending")]
+        Pending,
+        #[serde(rename = "active")]
+        Active,
+        #[serde(rename = "failed")]
+        Failed,
+    }
+    impl ::std::convert::From<&Self> for VaultStatus {
+        fn from(value: &VaultStatus) -> Self {
+            value.clone()
+        }
+    }
+    impl ::std::fmt::Display for VaultStatus {
+        fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+            match *self {
+                Self::Pending => f.write_str("pending"),
+                Self::Active => f.write_str("active"),
+                Self::Failed => f.write_str("failed"),
+            }
+        }
+    }
+    impl ::std::str::FromStr for VaultStatus {
+        type Err = self::error::ConversionError;
+        fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            match value {
+                "pending" => Ok(Self::Pending),
+                "active" => Ok(Self::Active),
+                "failed" => Ok(Self::Failed),
+                _ => Err("invalid value".into()),
+            }
+        }
+    }
+    impl ::std::convert::TryFrom<&str> for VaultStatus {
+        type Error = self::error::ConversionError;
+        fn try_from(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<&::std::string::String> for VaultStatus {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: &::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
+    impl ::std::convert::TryFrom<::std::string::String> for VaultStatus {
+        type Error = self::error::ConversionError;
+        fn try_from(
+            value: ::std::string::String,
+        ) -> ::std::result::Result<Self, self::error::ConversionError> {
+            value.parse()
+        }
+    }
     ///`VerifyX402PaymentBody`
     ///
     /// <details><summary>JSON schema</summary>
@@ -124444,7 +127581,7 @@ pub mod types {
         }
     }
     /**Request to create a new webhook subscription with support for multi-label filtering.
-     */
+    */
     ///
     /// <details><summary>JSON schema</summary>
     ///
@@ -124836,7 +127973,7 @@ pub mod types {
         }
     }
     /**Request to update an existing webhook subscription.
-     */
+    */
     ///
     /// <details><summary>JSON schema</summary>
     ///
@@ -143331,6 +146468,46 @@ pub mod types {
             }
         }
         #[derive(Clone, Debug)]
+        pub struct AndroidIntegrityPayload {
+            integrity_token: ::std::result::Result<::std::string::String, ::std::string::String>,
+        }
+        impl ::std::default::Default for AndroidIntegrityPayload {
+            fn default() -> Self {
+                Self {
+                    integrity_token: Err("no value supplied for integrity_token".to_string()),
+                }
+            }
+        }
+        impl AndroidIntegrityPayload {
+            pub fn integrity_token<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<::std::string::String>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.integrity_token = value.try_into().map_err(|e| {
+                    format!("error converting supplied value for integrity_token: {}", e)
+                });
+                self
+            }
+        }
+        impl ::std::convert::TryFrom<AndroidIntegrityPayload> for super::AndroidIntegrityPayload {
+            type Error = super::error::ConversionError;
+            fn try_from(
+                value: AndroidIntegrityPayload,
+            ) -> ::std::result::Result<Self, super::error::ConversionError> {
+                Ok(Self {
+                    integrity_token: value.integrity_token?,
+                })
+            }
+        }
+        impl ::std::convert::From<super::AndroidIntegrityPayload> for AndroidIntegrityPayload {
+            fn from(value: super::AndroidIntegrityPayload) -> Self {
+                Self {
+                    integrity_token: Ok(value.integrity_token),
+                }
+            }
+        }
+        #[derive(Clone, Debug)]
         pub struct Approval {
             approval_id: ::std::result::Result<super::ApprovalId, ::std::string::String>,
             created_at: ::std::result::Result<
@@ -143486,6 +146663,65 @@ pub mod types {
                     source: Ok(value.source),
                     status: Ok(value.status),
                     updated_at: Ok(value.updated_at),
+                }
+            }
+        }
+        #[derive(Clone, Debug)]
+        pub struct ApyMetrics {
+            apy_bps: ::std::result::Result<::std::option::Option<i64>, ::std::string::String>,
+            apy_updated_at: ::std::result::Result<
+                ::std::option::Option<::chrono::DateTime<::chrono::offset::Utc>>,
+                ::std::string::String,
+            >,
+        }
+        impl ::std::default::Default for ApyMetrics {
+            fn default() -> Self {
+                Self {
+                    apy_bps: Ok(Default::default()),
+                    apy_updated_at: Ok(Default::default()),
+                }
+            }
+        }
+        impl ApyMetrics {
+            pub fn apy_bps<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<::std::option::Option<i64>>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.apy_bps = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for apy_bps: {}", e));
+                self
+            }
+            pub fn apy_updated_at<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<
+                    ::std::option::Option<::chrono::DateTime<::chrono::offset::Utc>>,
+                >,
+                T::Error: ::std::fmt::Display,
+            {
+                self.apy_updated_at = value.try_into().map_err(|e| {
+                    format!("error converting supplied value for apy_updated_at: {}", e)
+                });
+                self
+            }
+        }
+        impl ::std::convert::TryFrom<ApyMetrics> for super::ApyMetrics {
+            type Error = super::error::ConversionError;
+            fn try_from(
+                value: ApyMetrics,
+            ) -> ::std::result::Result<Self, super::error::ConversionError> {
+                Ok(Self {
+                    apy_bps: value.apy_bps?,
+                    apy_updated_at: value.apy_updated_at?,
+                })
+            }
+        }
+        impl ::std::convert::From<super::ApyMetrics> for ApyMetrics {
+            fn from(value: super::ApyMetrics) -> Self {
+                Self {
+                    apy_bps: Ok(value.apy_bps),
+                    apy_updated_at: Ok(value.apy_updated_at),
                 }
             }
         }
@@ -148659,6 +151895,50 @@ pub mod types {
                     metadata: Ok(value.metadata),
                     policy: Ok(value.policy),
                     revocation_redirect: Ok(value.revocation_redirect),
+                }
+            }
+        }
+        #[derive(Clone, Debug)]
+        pub struct CreateOnrampMobileSessionResponse {
+            session: ::std::result::Result<super::OnrampSession, ::std::string::String>,
+        }
+        impl ::std::default::Default for CreateOnrampMobileSessionResponse {
+            fn default() -> Self {
+                Self {
+                    session: Err("no value supplied for session".to_string()),
+                }
+            }
+        }
+        impl CreateOnrampMobileSessionResponse {
+            pub fn session<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<super::OnrampSession>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.session = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for session: {}", e));
+                self
+            }
+        }
+        impl ::std::convert::TryFrom<CreateOnrampMobileSessionResponse>
+            for super::CreateOnrampMobileSessionResponse
+        {
+            type Error = super::error::ConversionError;
+            fn try_from(
+                value: CreateOnrampMobileSessionResponse,
+            ) -> ::std::result::Result<Self, super::error::ConversionError> {
+                Ok(Self {
+                    session: value.session?,
+                })
+            }
+        }
+        impl ::std::convert::From<super::CreateOnrampMobileSessionResponse>
+            for CreateOnrampMobileSessionResponse
+        {
+            fn from(value: super::CreateOnrampMobileSessionResponse) -> Self {
+                Self {
+                    session: Ok(value.session),
                 }
             }
         }
@@ -154126,6 +157406,52 @@ pub mod types {
             fn from(value: super::EntityWebhookResponseLabels) -> Self {
                 Self {
                     entity: Ok(value.entity),
+                }
+            }
+        }
+        #[derive(Clone, Debug)]
+        pub struct EoaVaultRedeemFeesResponse {
+            transaction_hash: ::std::result::Result<
+                super::EoaVaultRedeemFeesResponseTransactionHash,
+                ::std::string::String,
+            >,
+        }
+        impl ::std::default::Default for EoaVaultRedeemFeesResponse {
+            fn default() -> Self {
+                Self {
+                    transaction_hash: Err("no value supplied for transaction_hash".to_string()),
+                }
+            }
+        }
+        impl EoaVaultRedeemFeesResponse {
+            pub fn transaction_hash<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<super::EoaVaultRedeemFeesResponseTransactionHash>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.transaction_hash = value.try_into().map_err(|e| {
+                    format!(
+                        "error converting supplied value for transaction_hash: {}",
+                        e
+                    )
+                });
+                self
+            }
+        }
+        impl ::std::convert::TryFrom<EoaVaultRedeemFeesResponse> for super::EoaVaultRedeemFeesResponse {
+            type Error = super::error::ConversionError;
+            fn try_from(
+                value: EoaVaultRedeemFeesResponse,
+            ) -> ::std::result::Result<Self, super::error::ConversionError> {
+                Ok(Self {
+                    transaction_hash: value.transaction_hash?,
+                })
+            }
+        }
+        impl ::std::convert::From<super::EoaVaultRedeemFeesResponse> for EoaVaultRedeemFeesResponse {
+            fn from(value: super::EoaVaultRedeemFeesResponse) -> Self {
+                Self {
+                    transaction_hash: Ok(value.transaction_hash),
                 }
             }
         }
@@ -160434,6 +163760,344 @@ pub mod types {
             }
         }
         #[derive(Clone, Debug)]
+        pub struct IosAssertionPayload {
+            assertion: ::std::result::Result<::std::string::String, ::std::string::String>,
+            key_id: ::std::result::Result<::std::string::String, ::std::string::String>,
+        }
+        impl ::std::default::Default for IosAssertionPayload {
+            fn default() -> Self {
+                Self {
+                    assertion: Err("no value supplied for assertion".to_string()),
+                    key_id: Err("no value supplied for key_id".to_string()),
+                }
+            }
+        }
+        impl IosAssertionPayload {
+            pub fn assertion<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<::std::string::String>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.assertion = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for assertion: {}", e));
+                self
+            }
+            pub fn key_id<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<::std::string::String>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.key_id = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for key_id: {}", e));
+                self
+            }
+        }
+        impl ::std::convert::TryFrom<IosAssertionPayload> for super::IosAssertionPayload {
+            type Error = super::error::ConversionError;
+            fn try_from(
+                value: IosAssertionPayload,
+            ) -> ::std::result::Result<Self, super::error::ConversionError> {
+                Ok(Self {
+                    assertion: value.assertion?,
+                    key_id: value.key_id?,
+                })
+            }
+        }
+        impl ::std::convert::From<super::IosAssertionPayload> for IosAssertionPayload {
+            fn from(value: super::IosAssertionPayload) -> Self {
+                Self {
+                    assertion: Ok(value.assertion),
+                    key_id: Ok(value.key_id),
+                }
+            }
+        }
+        #[derive(Clone, Debug)]
+        pub struct IosAttestationChallenge {
+            challenge: ::std::result::Result<
+                super::IosAttestationChallengeChallenge,
+                ::std::string::String,
+            >,
+            expires_at: ::std::result::Result<
+                ::chrono::DateTime<::chrono::offset::Utc>,
+                ::std::string::String,
+            >,
+        }
+        impl ::std::default::Default for IosAttestationChallenge {
+            fn default() -> Self {
+                Self {
+                    challenge: Err("no value supplied for challenge".to_string()),
+                    expires_at: Err("no value supplied for expires_at".to_string()),
+                }
+            }
+        }
+        impl IosAttestationChallenge {
+            pub fn challenge<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<super::IosAttestationChallengeChallenge>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.challenge = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for challenge: {}", e));
+                self
+            }
+            pub fn expires_at<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<::chrono::DateTime<::chrono::offset::Utc>>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.expires_at = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for expires_at: {}", e));
+                self
+            }
+        }
+        impl ::std::convert::TryFrom<IosAttestationChallenge> for super::IosAttestationChallenge {
+            type Error = super::error::ConversionError;
+            fn try_from(
+                value: IosAttestationChallenge,
+            ) -> ::std::result::Result<Self, super::error::ConversionError> {
+                Ok(Self {
+                    challenge: value.challenge?,
+                    expires_at: value.expires_at?,
+                })
+            }
+        }
+        impl ::std::convert::From<super::IosAttestationChallenge> for IosAttestationChallenge {
+            fn from(value: super::IosAttestationChallenge) -> Self {
+                Self {
+                    challenge: Ok(value.challenge),
+                    expires_at: Ok(value.expires_at),
+                }
+            }
+        }
+        #[derive(Clone, Debug)]
+        pub struct IosAttestationPayload {
+            attestation: ::std::result::Result<
+                super::IosAttestationPayloadAttestation,
+                ::std::string::String,
+            >,
+            bundle_id: ::std::result::Result<super::IosBundleId, ::std::string::String>,
+            key_id: ::std::result::Result<::std::string::String, ::std::string::String>,
+        }
+        impl ::std::default::Default for IosAttestationPayload {
+            fn default() -> Self {
+                Self {
+                    attestation: Err("no value supplied for attestation".to_string()),
+                    bundle_id: Err("no value supplied for bundle_id".to_string()),
+                    key_id: Err("no value supplied for key_id".to_string()),
+                }
+            }
+        }
+        impl IosAttestationPayload {
+            pub fn attestation<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<super::IosAttestationPayloadAttestation>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.attestation = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for attestation: {}", e));
+                self
+            }
+            pub fn bundle_id<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<super::IosBundleId>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.bundle_id = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for bundle_id: {}", e));
+                self
+            }
+            pub fn key_id<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<::std::string::String>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.key_id = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for key_id: {}", e));
+                self
+            }
+        }
+        impl ::std::convert::TryFrom<IosAttestationPayload> for super::IosAttestationPayload {
+            type Error = super::error::ConversionError;
+            fn try_from(
+                value: IosAttestationPayload,
+            ) -> ::std::result::Result<Self, super::error::ConversionError> {
+                Ok(Self {
+                    attestation: value.attestation?,
+                    bundle_id: value.bundle_id?,
+                    key_id: value.key_id?,
+                })
+            }
+        }
+        impl ::std::convert::From<super::IosAttestationPayload> for IosAttestationPayload {
+            fn from(value: super::IosAttestationPayload) -> Self {
+                Self {
+                    attestation: Ok(value.attestation),
+                    bundle_id: Ok(value.bundle_id),
+                    key_id: Ok(value.key_id),
+                }
+            }
+        }
+        #[derive(Clone, Debug)]
+        pub struct IosAttestationRegistrationRequest {
+            challenge: ::std::result::Result<
+                super::IosAttestationRegistrationRequestChallenge,
+                ::std::string::String,
+            >,
+            ios: ::std::result::Result<super::IosAttestationPayload, ::std::string::String>,
+        }
+        impl ::std::default::Default for IosAttestationRegistrationRequest {
+            fn default() -> Self {
+                Self {
+                    challenge: Err("no value supplied for challenge".to_string()),
+                    ios: Err("no value supplied for ios".to_string()),
+                }
+            }
+        }
+        impl IosAttestationRegistrationRequest {
+            pub fn challenge<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<super::IosAttestationRegistrationRequestChallenge>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.challenge = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for challenge: {}", e));
+                self
+            }
+            pub fn ios<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<super::IosAttestationPayload>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.ios = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for ios: {}", e));
+                self
+            }
+        }
+        impl ::std::convert::TryFrom<IosAttestationRegistrationRequest>
+            for super::IosAttestationRegistrationRequest
+        {
+            type Error = super::error::ConversionError;
+            fn try_from(
+                value: IosAttestationRegistrationRequest,
+            ) -> ::std::result::Result<Self, super::error::ConversionError> {
+                Ok(Self {
+                    challenge: value.challenge?,
+                    ios: value.ios?,
+                })
+            }
+        }
+        impl ::std::convert::From<super::IosAttestationRegistrationRequest>
+            for IosAttestationRegistrationRequest
+        {
+            fn from(value: super::IosAttestationRegistrationRequest) -> Self {
+                Self {
+                    challenge: Ok(value.challenge),
+                    ios: Ok(value.ios),
+                }
+            }
+        }
+        #[derive(Clone, Debug)]
+        pub struct IosAttestationRegistrationResponse {
+            app_id: ::std::result::Result<::std::string::String, ::std::string::String>,
+            attested_at: ::std::result::Result<
+                ::chrono::DateTime<::chrono::offset::Utc>,
+                ::std::string::String,
+            >,
+            key_id: ::std::result::Result<::std::string::String, ::std::string::String>,
+            platform: ::std::result::Result<
+                super::IosAttestationRegistrationResponsePlatform,
+                ::std::string::String,
+            >,
+        }
+        impl ::std::default::Default for IosAttestationRegistrationResponse {
+            fn default() -> Self {
+                Self {
+                    app_id: Err("no value supplied for app_id".to_string()),
+                    attested_at: Err("no value supplied for attested_at".to_string()),
+                    key_id: Err("no value supplied for key_id".to_string()),
+                    platform: Err("no value supplied for platform".to_string()),
+                }
+            }
+        }
+        impl IosAttestationRegistrationResponse {
+            pub fn app_id<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<::std::string::String>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.app_id = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for app_id: {}", e));
+                self
+            }
+            pub fn attested_at<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<::chrono::DateTime<::chrono::offset::Utc>>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.attested_at = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for attested_at: {}", e));
+                self
+            }
+            pub fn key_id<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<::std::string::String>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.key_id = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for key_id: {}", e));
+                self
+            }
+            pub fn platform<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<super::IosAttestationRegistrationResponsePlatform>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.platform = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for platform: {}", e));
+                self
+            }
+        }
+        impl ::std::convert::TryFrom<IosAttestationRegistrationResponse>
+            for super::IosAttestationRegistrationResponse
+        {
+            type Error = super::error::ConversionError;
+            fn try_from(
+                value: IosAttestationRegistrationResponse,
+            ) -> ::std::result::Result<Self, super::error::ConversionError> {
+                Ok(Self {
+                    app_id: value.app_id?,
+                    attested_at: value.attested_at?,
+                    key_id: value.key_id?,
+                    platform: value.platform?,
+                })
+            }
+        }
+        impl ::std::convert::From<super::IosAttestationRegistrationResponse>
+            for IosAttestationRegistrationResponse
+        {
+            fn from(value: super::IosAttestationRegistrationResponse) -> Self {
+                Self {
+                    app_id: Ok(value.app_id),
+                    attested_at: Ok(value.attested_at),
+                    key_id: Ok(value.key_id),
+                    platform: Ok(value.platform),
+                }
+            }
+        }
+        #[derive(Clone, Debug)]
         pub struct ListBalancesResponse {
             balances: ::std::result::Result<::std::vec::Vec<super::Balance>, ::std::string::String>,
             next_page_token: ::std::result::Result<
@@ -162042,6 +165706,63 @@ pub mod types {
                 Self {
                     next_page_token: Ok(value.next_page_token),
                     transfers: Ok(value.transfers),
+                }
+            }
+        }
+        #[derive(Clone, Debug)]
+        pub struct ListVaultsResponse {
+            next_page_token: ::std::result::Result<
+                ::std::option::Option<::std::string::String>,
+                ::std::string::String,
+            >,
+            vaults: ::std::result::Result<::std::vec::Vec<super::Vault>, ::std::string::String>,
+        }
+        impl ::std::default::Default for ListVaultsResponse {
+            fn default() -> Self {
+                Self {
+                    next_page_token: Ok(Default::default()),
+                    vaults: Err("no value supplied for vaults".to_string()),
+                }
+            }
+        }
+        impl ListVaultsResponse {
+            pub fn next_page_token<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<::std::option::Option<::std::string::String>>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.next_page_token = value.try_into().map_err(|e| {
+                    format!("error converting supplied value for next_page_token: {}", e)
+                });
+                self
+            }
+            pub fn vaults<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<::std::vec::Vec<super::Vault>>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.vaults = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for vaults: {}", e));
+                self
+            }
+        }
+        impl ::std::convert::TryFrom<ListVaultsResponse> for super::ListVaultsResponse {
+            type Error = super::error::ConversionError;
+            fn try_from(
+                value: ListVaultsResponse,
+            ) -> ::std::result::Result<Self, super::error::ConversionError> {
+                Ok(Self {
+                    next_page_token: value.next_page_token?,
+                    vaults: value.vaults?,
+                })
+            }
+        }
+        impl ::std::convert::From<super::ListVaultsResponse> for ListVaultsResponse {
+            fn from(value: super::ListVaultsResponse) -> Self {
+                Self {
+                    next_page_token: Ok(value.next_page_token),
+                    vaults: Ok(value.vaults),
                 }
             }
         }
@@ -166357,6 +170078,64 @@ pub mod types {
             }
         }
         #[derive(Clone, Debug)]
+        pub struct OnrampMobileChallenge {
+            challenge:
+                ::std::result::Result<super::OnrampMobileChallengeToken, ::std::string::String>,
+            expires_at: ::std::result::Result<
+                ::chrono::DateTime<::chrono::offset::Utc>,
+                ::std::string::String,
+            >,
+        }
+        impl ::std::default::Default for OnrampMobileChallenge {
+            fn default() -> Self {
+                Self {
+                    challenge: Err("no value supplied for challenge".to_string()),
+                    expires_at: Err("no value supplied for expires_at".to_string()),
+                }
+            }
+        }
+        impl OnrampMobileChallenge {
+            pub fn challenge<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<super::OnrampMobileChallengeToken>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.challenge = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for challenge: {}", e));
+                self
+            }
+            pub fn expires_at<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<::chrono::DateTime<::chrono::offset::Utc>>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.expires_at = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for expires_at: {}", e));
+                self
+            }
+        }
+        impl ::std::convert::TryFrom<OnrampMobileChallenge> for super::OnrampMobileChallenge {
+            type Error = super::error::ConversionError;
+            fn try_from(
+                value: OnrampMobileChallenge,
+            ) -> ::std::result::Result<Self, super::error::ConversionError> {
+                Ok(Self {
+                    challenge: value.challenge?,
+                    expires_at: value.expires_at?,
+                })
+            }
+        }
+        impl ::std::convert::From<super::OnrampMobileChallenge> for OnrampMobileChallenge {
+            fn from(value: super::OnrampMobileChallenge) -> Self {
+                Self {
+                    challenge: Ok(value.challenge),
+                    expires_at: Ok(value.expires_at),
+                }
+            }
+        }
+        #[derive(Clone, Debug)]
         pub struct OnrampOrder {
             created_at: ::std::result::Result<::std::string::String, ::std::string::String>,
             destination_address:
@@ -168402,6 +172181,51 @@ pub mod types {
                     fee_amount: Ok(value.fee_amount),
                     fee_currency: Ok(value.fee_currency),
                     fee_type: Ok(value.fee_type),
+                }
+            }
+        }
+        #[derive(Clone, Debug)]
+        pub struct PausePolicyRequest {
+            resume_at: ::std::result::Result<
+                ::std::option::Option<::chrono::DateTime<::chrono::offset::Utc>>,
+                ::std::string::String,
+            >,
+        }
+        impl ::std::default::Default for PausePolicyRequest {
+            fn default() -> Self {
+                Self {
+                    resume_at: Ok(Default::default()),
+                }
+            }
+        }
+        impl PausePolicyRequest {
+            pub fn resume_at<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<
+                    ::std::option::Option<::chrono::DateTime<::chrono::offset::Utc>>,
+                >,
+                T::Error: ::std::fmt::Display,
+            {
+                self.resume_at = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for resume_at: {}", e));
+                self
+            }
+        }
+        impl ::std::convert::TryFrom<PausePolicyRequest> for super::PausePolicyRequest {
+            type Error = super::error::ConversionError;
+            fn try_from(
+                value: PausePolicyRequest,
+            ) -> ::std::result::Result<Self, super::error::ConversionError> {
+                Ok(Self {
+                    resume_at: value.resume_at?,
+                })
+            }
+        }
+        impl ::std::convert::From<super::PausePolicyRequest> for PausePolicyRequest {
+            fn from(value: super::PausePolicyRequest) -> Self {
+                Self {
+                    resume_at: Ok(value.resume_at),
                 }
             }
         }
@@ -171877,8 +175701,20 @@ pub mod types {
                 ::std::string::String,
             >,
             id: ::std::result::Result<super::PolicyId, ::std::string::String>,
+            paused_at: ::std::result::Result<
+                ::std::option::Option<::chrono::DateTime<::chrono::offset::Utc>>,
+                ::std::string::String,
+            >,
+            resume_at: ::std::result::Result<
+                ::std::option::Option<::chrono::DateTime<::chrono::offset::Utc>>,
+                ::std::string::String,
+            >,
             rules: ::std::result::Result<super::PolicyRules, ::std::string::String>,
             scope: ::std::result::Result<super::PolicyScope, ::std::string::String>,
+            status: ::std::result::Result<
+                ::std::option::Option<super::PolicyStatus>,
+                ::std::string::String,
+            >,
             updated_at: ::std::result::Result<::std::string::String, ::std::string::String>,
         }
         impl ::std::default::Default for Policy {
@@ -171887,8 +175723,11 @@ pub mod types {
                     created_at: Err("no value supplied for created_at".to_string()),
                     description: Ok(Default::default()),
                     id: Err("no value supplied for id".to_string()),
+                    paused_at: Ok(Default::default()),
+                    resume_at: Ok(Default::default()),
                     rules: Err("no value supplied for rules".to_string()),
                     scope: Err("no value supplied for scope".to_string()),
+                    status: Ok(Default::default()),
                     updated_at: Err("no value supplied for updated_at".to_string()),
                 }
             }
@@ -171924,6 +175763,30 @@ pub mod types {
                     .map_err(|e| format!("error converting supplied value for id: {}", e));
                 self
             }
+            pub fn paused_at<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<
+                    ::std::option::Option<::chrono::DateTime<::chrono::offset::Utc>>,
+                >,
+                T::Error: ::std::fmt::Display,
+            {
+                self.paused_at = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for paused_at: {}", e));
+                self
+            }
+            pub fn resume_at<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<
+                    ::std::option::Option<::chrono::DateTime<::chrono::offset::Utc>>,
+                >,
+                T::Error: ::std::fmt::Display,
+            {
+                self.resume_at = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for resume_at: {}", e));
+                self
+            }
             pub fn rules<T>(mut self, value: T) -> Self
             where
                 T: ::std::convert::TryInto<super::PolicyRules>,
@@ -171942,6 +175805,16 @@ pub mod types {
                 self.scope = value
                     .try_into()
                     .map_err(|e| format!("error converting supplied value for scope: {}", e));
+                self
+            }
+            pub fn status<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<::std::option::Option<super::PolicyStatus>>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.status = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for status: {}", e));
                 self
             }
             pub fn updated_at<T>(mut self, value: T) -> Self
@@ -171964,8 +175837,11 @@ pub mod types {
                     created_at: value.created_at?,
                     description: value.description?,
                     id: value.id?,
+                    paused_at: value.paused_at?,
+                    resume_at: value.resume_at?,
                     rules: value.rules?,
                     scope: value.scope?,
+                    status: value.status?,
                     updated_at: value.updated_at?,
                 })
             }
@@ -171976,8 +175852,11 @@ pub mod types {
                     created_at: Ok(value.created_at),
                     description: Ok(value.description),
                     id: Ok(value.id),
+                    paused_at: Ok(value.paused_at),
+                    resume_at: Ok(value.resume_at),
                     rules: Ok(value.rules),
                     scope: Ok(value.scope),
+                    status: Ok(value.status),
                     updated_at: Ok(value.updated_at),
                 }
             }
@@ -180745,6 +184624,168 @@ pub mod types {
             }
         }
         #[derive(Clone, Debug)]
+        pub struct SmartAccountVaultRedeemFeesRequest {
+            max_slippage_bps:
+                ::std::result::Result<::std::option::Option<i64>, ::std::string::String>,
+            paymaster_context: ::std::result::Result<
+                ::std::option::Option<super::PaymasterContext>,
+                ::std::string::String,
+            >,
+            paymaster_url:
+                ::std::result::Result<::std::option::Option<super::Url>, ::std::string::String>,
+            use_cdp_paymaster:
+                ::std::result::Result<::std::option::Option<bool>, ::std::string::String>,
+            vault_id: ::std::result::Result<super::VaultId, ::std::string::String>,
+        }
+        impl ::std::default::Default for SmartAccountVaultRedeemFeesRequest {
+            fn default() -> Self {
+                Self {
+                    max_slippage_bps: Ok(Default::default()),
+                    paymaster_context: Ok(Default::default()),
+                    paymaster_url: Ok(Default::default()),
+                    use_cdp_paymaster: Ok(Default::default()),
+                    vault_id: Err("no value supplied for vault_id".to_string()),
+                }
+            }
+        }
+        impl SmartAccountVaultRedeemFeesRequest {
+            pub fn max_slippage_bps<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<::std::option::Option<i64>>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.max_slippage_bps = value.try_into().map_err(|e| {
+                    format!(
+                        "error converting supplied value for max_slippage_bps: {}",
+                        e
+                    )
+                });
+                self
+            }
+            pub fn paymaster_context<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<::std::option::Option<super::PaymasterContext>>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.paymaster_context = value.try_into().map_err(|e| {
+                    format!(
+                        "error converting supplied value for paymaster_context: {}",
+                        e
+                    )
+                });
+                self
+            }
+            pub fn paymaster_url<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<::std::option::Option<super::Url>>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.paymaster_url = value.try_into().map_err(|e| {
+                    format!("error converting supplied value for paymaster_url: {}", e)
+                });
+                self
+            }
+            pub fn use_cdp_paymaster<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<::std::option::Option<bool>>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.use_cdp_paymaster = value.try_into().map_err(|e| {
+                    format!(
+                        "error converting supplied value for use_cdp_paymaster: {}",
+                        e
+                    )
+                });
+                self
+            }
+            pub fn vault_id<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<super::VaultId>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.vault_id = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for vault_id: {}", e));
+                self
+            }
+        }
+        impl ::std::convert::TryFrom<SmartAccountVaultRedeemFeesRequest>
+            for super::SmartAccountVaultRedeemFeesRequest
+        {
+            type Error = super::error::ConversionError;
+            fn try_from(
+                value: SmartAccountVaultRedeemFeesRequest,
+            ) -> ::std::result::Result<Self, super::error::ConversionError> {
+                Ok(Self {
+                    max_slippage_bps: value.max_slippage_bps?,
+                    paymaster_context: value.paymaster_context?,
+                    paymaster_url: value.paymaster_url?,
+                    use_cdp_paymaster: value.use_cdp_paymaster?,
+                    vault_id: value.vault_id?,
+                })
+            }
+        }
+        impl ::std::convert::From<super::SmartAccountVaultRedeemFeesRequest>
+            for SmartAccountVaultRedeemFeesRequest
+        {
+            fn from(value: super::SmartAccountVaultRedeemFeesRequest) -> Self {
+                Self {
+                    max_slippage_bps: Ok(value.max_slippage_bps),
+                    paymaster_context: Ok(value.paymaster_context),
+                    paymaster_url: Ok(value.paymaster_url),
+                    use_cdp_paymaster: Ok(value.use_cdp_paymaster),
+                    vault_id: Ok(value.vault_id),
+                }
+            }
+        }
+        #[derive(Clone, Debug)]
+        pub struct SmartAccountVaultRedeemFeesResponse {
+            user_op_hash: ::std::result::Result<
+                super::SmartAccountVaultRedeemFeesResponseUserOpHash,
+                ::std::string::String,
+            >,
+        }
+        impl ::std::default::Default for SmartAccountVaultRedeemFeesResponse {
+            fn default() -> Self {
+                Self {
+                    user_op_hash: Err("no value supplied for user_op_hash".to_string()),
+                }
+            }
+        }
+        impl SmartAccountVaultRedeemFeesResponse {
+            pub fn user_op_hash<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<super::SmartAccountVaultRedeemFeesResponseUserOpHash>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.user_op_hash = value.try_into().map_err(|e| {
+                    format!("error converting supplied value for user_op_hash: {}", e)
+                });
+                self
+            }
+        }
+        impl ::std::convert::TryFrom<SmartAccountVaultRedeemFeesResponse>
+            for super::SmartAccountVaultRedeemFeesResponse
+        {
+            type Error = super::error::ConversionError;
+            fn try_from(
+                value: SmartAccountVaultRedeemFeesResponse,
+            ) -> ::std::result::Result<Self, super::error::ConversionError> {
+                Ok(Self {
+                    user_op_hash: value.user_op_hash?,
+                })
+            }
+        }
+        impl ::std::convert::From<super::SmartAccountVaultRedeemFeesResponse>
+            for SmartAccountVaultRedeemFeesResponse
+        {
+            fn from(value: super::SmartAccountVaultRedeemFeesResponse) -> Self {
+                Self {
+                    user_op_hash: Ok(value.user_op_hash),
+                }
+            }
+        }
+        #[derive(Clone, Debug)]
         pub struct SmsAuthentication {
             phone_number: ::std::result::Result<super::PhoneNumber, ::std::string::String>,
             type_: ::std::result::Result<super::SmsAuthenticationType, ::std::string::String>,
@@ -186324,6 +190365,348 @@ pub mod types {
             fn from(value: super::ValidateEndUserAccessTokenBody) -> Self {
                 Self {
                     access_token: Ok(value.access_token),
+                }
+            }
+        }
+        #[derive(Clone, Debug)]
+        pub struct Vault {
+            address: ::std::result::Result<super::VaultAddress, ::std::string::String>,
+            catalog_vault_id: ::std::result::Result<super::CatalogVaultId, ::std::string::String>,
+            created_at: ::std::result::Result<
+                ::chrono::DateTime<::chrono::offset::Utc>,
+                ::std::string::String,
+            >,
+            fee_recipient_address:
+                ::std::result::Result<super::VaultFeeRecipientAddress, ::std::string::String>,
+            metrics: ::std::result::Result<
+                ::std::option::Option<super::VaultMetrics>,
+                ::std::string::String,
+            >,
+            network: ::std::result::Result<super::LendNetwork, ::std::string::String>,
+            performance_fee_bps: ::std::result::Result<i64, ::std::string::String>,
+            status: ::std::result::Result<super::VaultStatus, ::std::string::String>,
+            underlying_asset: ::std::result::Result<super::Asset, ::std::string::String>,
+            vault_id: ::std::result::Result<super::VaultId, ::std::string::String>,
+        }
+        impl ::std::default::Default for Vault {
+            fn default() -> Self {
+                Self {
+                    address: Err("no value supplied for address".to_string()),
+                    catalog_vault_id: Err("no value supplied for catalog_vault_id".to_string()),
+                    created_at: Err("no value supplied for created_at".to_string()),
+                    fee_recipient_address: Err(
+                        "no value supplied for fee_recipient_address".to_string()
+                    ),
+                    metrics: Ok(Default::default()),
+                    network: Err("no value supplied for network".to_string()),
+                    performance_fee_bps: Err(
+                        "no value supplied for performance_fee_bps".to_string()
+                    ),
+                    status: Err("no value supplied for status".to_string()),
+                    underlying_asset: Err("no value supplied for underlying_asset".to_string()),
+                    vault_id: Err("no value supplied for vault_id".to_string()),
+                }
+            }
+        }
+        impl Vault {
+            pub fn address<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<super::VaultAddress>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.address = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for address: {}", e));
+                self
+            }
+            pub fn catalog_vault_id<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<super::CatalogVaultId>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.catalog_vault_id = value.try_into().map_err(|e| {
+                    format!(
+                        "error converting supplied value for catalog_vault_id: {}",
+                        e
+                    )
+                });
+                self
+            }
+            pub fn created_at<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<::chrono::DateTime<::chrono::offset::Utc>>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.created_at = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for created_at: {}", e));
+                self
+            }
+            pub fn fee_recipient_address<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<super::VaultFeeRecipientAddress>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.fee_recipient_address = value.try_into().map_err(|e| {
+                    format!(
+                        "error converting supplied value for fee_recipient_address: {}",
+                        e
+                    )
+                });
+                self
+            }
+            pub fn metrics<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<::std::option::Option<super::VaultMetrics>>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.metrics = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for metrics: {}", e));
+                self
+            }
+            pub fn network<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<super::LendNetwork>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.network = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for network: {}", e));
+                self
+            }
+            pub fn performance_fee_bps<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<i64>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.performance_fee_bps = value.try_into().map_err(|e| {
+                    format!(
+                        "error converting supplied value for performance_fee_bps: {}",
+                        e
+                    )
+                });
+                self
+            }
+            pub fn status<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<super::VaultStatus>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.status = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for status: {}", e));
+                self
+            }
+            pub fn underlying_asset<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<super::Asset>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.underlying_asset = value.try_into().map_err(|e| {
+                    format!(
+                        "error converting supplied value for underlying_asset: {}",
+                        e
+                    )
+                });
+                self
+            }
+            pub fn vault_id<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<super::VaultId>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.vault_id = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for vault_id: {}", e));
+                self
+            }
+        }
+        impl ::std::convert::TryFrom<Vault> for super::Vault {
+            type Error = super::error::ConversionError;
+            fn try_from(
+                value: Vault,
+            ) -> ::std::result::Result<Self, super::error::ConversionError> {
+                Ok(Self {
+                    address: value.address?,
+                    catalog_vault_id: value.catalog_vault_id?,
+                    created_at: value.created_at?,
+                    fee_recipient_address: value.fee_recipient_address?,
+                    metrics: value.metrics?,
+                    network: value.network?,
+                    performance_fee_bps: value.performance_fee_bps?,
+                    status: value.status?,
+                    underlying_asset: value.underlying_asset?,
+                    vault_id: value.vault_id?,
+                })
+            }
+        }
+        impl ::std::convert::From<super::Vault> for Vault {
+            fn from(value: super::Vault) -> Self {
+                Self {
+                    address: Ok(value.address),
+                    catalog_vault_id: Ok(value.catalog_vault_id),
+                    created_at: Ok(value.created_at),
+                    fee_recipient_address: Ok(value.fee_recipient_address),
+                    metrics: Ok(value.metrics),
+                    network: Ok(value.network),
+                    performance_fee_bps: Ok(value.performance_fee_bps),
+                    status: Ok(value.status),
+                    underlying_asset: Ok(value.underlying_asset),
+                    vault_id: Ok(value.vault_id),
+                }
+            }
+        }
+        #[derive(Clone, Debug)]
+        pub struct VaultMetrics {
+            apy_bps: ::std::result::Result<::std::option::Option<i64>, ::std::string::String>,
+            apy_updated_at: ::std::result::Result<
+                ::std::option::Option<::chrono::DateTime<::chrono::offset::Utc>>,
+                ::std::string::String,
+            >,
+            tvl: ::std::result::Result<
+                ::std::option::Option<super::NonNegativeDecimal>,
+                ::std::string::String,
+            >,
+            tvl_updated_at: ::std::result::Result<
+                ::std::option::Option<::chrono::DateTime<::chrono::offset::Utc>>,
+                ::std::string::String,
+            >,
+        }
+        impl ::std::default::Default for VaultMetrics {
+            fn default() -> Self {
+                Self {
+                    apy_bps: Ok(Default::default()),
+                    apy_updated_at: Ok(Default::default()),
+                    tvl: Ok(Default::default()),
+                    tvl_updated_at: Ok(Default::default()),
+                }
+            }
+        }
+        impl VaultMetrics {
+            pub fn apy_bps<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<::std::option::Option<i64>>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.apy_bps = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for apy_bps: {}", e));
+                self
+            }
+            pub fn apy_updated_at<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<
+                    ::std::option::Option<::chrono::DateTime<::chrono::offset::Utc>>,
+                >,
+                T::Error: ::std::fmt::Display,
+            {
+                self.apy_updated_at = value.try_into().map_err(|e| {
+                    format!("error converting supplied value for apy_updated_at: {}", e)
+                });
+                self
+            }
+            pub fn tvl<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<::std::option::Option<super::NonNegativeDecimal>>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.tvl = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for tvl: {}", e));
+                self
+            }
+            pub fn tvl_updated_at<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<
+                    ::std::option::Option<::chrono::DateTime<::chrono::offset::Utc>>,
+                >,
+                T::Error: ::std::fmt::Display,
+            {
+                self.tvl_updated_at = value.try_into().map_err(|e| {
+                    format!("error converting supplied value for tvl_updated_at: {}", e)
+                });
+                self
+            }
+        }
+        impl ::std::convert::TryFrom<VaultMetrics> for super::VaultMetrics {
+            type Error = super::error::ConversionError;
+            fn try_from(
+                value: VaultMetrics,
+            ) -> ::std::result::Result<Self, super::error::ConversionError> {
+                Ok(Self {
+                    apy_bps: value.apy_bps?,
+                    apy_updated_at: value.apy_updated_at?,
+                    tvl: value.tvl?,
+                    tvl_updated_at: value.tvl_updated_at?,
+                })
+            }
+        }
+        impl ::std::convert::From<super::VaultMetrics> for VaultMetrics {
+            fn from(value: super::VaultMetrics) -> Self {
+                Self {
+                    apy_bps: Ok(value.apy_bps),
+                    apy_updated_at: Ok(value.apy_updated_at),
+                    tvl: Ok(value.tvl),
+                    tvl_updated_at: Ok(value.tvl_updated_at),
+                }
+            }
+        }
+        #[derive(Clone, Debug)]
+        pub struct VaultRedeemFeesRequest {
+            max_slippage_bps:
+                ::std::result::Result<::std::option::Option<i64>, ::std::string::String>,
+            vault_id: ::std::result::Result<super::VaultId, ::std::string::String>,
+        }
+        impl ::std::default::Default for VaultRedeemFeesRequest {
+            fn default() -> Self {
+                Self {
+                    max_slippage_bps: Ok(Default::default()),
+                    vault_id: Err("no value supplied for vault_id".to_string()),
+                }
+            }
+        }
+        impl VaultRedeemFeesRequest {
+            pub fn max_slippage_bps<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<::std::option::Option<i64>>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.max_slippage_bps = value.try_into().map_err(|e| {
+                    format!(
+                        "error converting supplied value for max_slippage_bps: {}",
+                        e
+                    )
+                });
+                self
+            }
+            pub fn vault_id<T>(mut self, value: T) -> Self
+            where
+                T: ::std::convert::TryInto<super::VaultId>,
+                T::Error: ::std::fmt::Display,
+            {
+                self.vault_id = value
+                    .try_into()
+                    .map_err(|e| format!("error converting supplied value for vault_id: {}", e));
+                self
+            }
+        }
+        impl ::std::convert::TryFrom<VaultRedeemFeesRequest> for super::VaultRedeemFeesRequest {
+            type Error = super::error::ConversionError;
+            fn try_from(
+                value: VaultRedeemFeesRequest,
+            ) -> ::std::result::Result<Self, super::error::ConversionError> {
+                Ok(Self {
+                    max_slippage_bps: value.max_slippage_bps?,
+                    vault_id: value.vault_id?,
+                })
+            }
+        }
+        impl ::std::convert::From<super::VaultRedeemFeesRequest> for VaultRedeemFeesRequest {
+            fn from(value: super::VaultRedeemFeesRequest) -> Self {
+                Self {
+                    max_slippage_bps: Ok(value.max_slippage_bps),
+                    vault_id: Ok(value.vault_id),
                 }
             }
         }
@@ -197258,6 +201641,38 @@ impl Client {
     pub fn export_evm_account(&self) -> builder::ExportEvmAccount<'_> {
         builder::ExportEvmAccount::new(self)
     }
+    /**Redeem vault fees with an EVM account
+
+    Redeems every vault share held by the vault's fee recipient EVM account for the vault's underlying asset (e.g. USDC). The account must be the vault's fee recipient.
+    CDP periodically distributes each vault's accrued fees to its fee recipient as vault shares. This API redeems the account's full share balance, including any shares from the account's own deposits into the vault, so use a dedicated fee recipient account.
+    The account signs an EIP-2612 permit over its vault shares, and the share approval and redemption are executed in a single transaction.
+    For fee recipients that are EVM Smart Accounts, use `redeemVaultFeesWithEvmSmartAccount` instead.
+
+    Sends a `POST` request to `/v2/evm/accounts/{address}/lend/redeem-fees`
+
+    Arguments:
+    - `address`: The 0x-prefixed address of the EVM account that is the vault's fee recipient.
+    - `x_idempotency_key`: An optional string request header for making requests safely retryable.
+    When included, duplicate requests with the same key will return identical responses.
+    Refer to our [Idempotency docs](https://docs.cdp.coinbase.com/api-reference/v2/idempotency) for more information on using idempotency keys.
+
+    - `x_wallet_auth`: A JWT signed using your Wallet Secret, encoded in base64. Refer to the
+    [Generate Wallet Token](https://docs.cdp.coinbase.com/api-reference/v2/authentication#2-generate-wallet-token)
+    section of our Authentication docs for more details on how to generate your Wallet Token.
+
+    - `body`
+    ```ignore
+    let response = client.redeem_vault_fees_with_evm_account()
+        .address(address)
+        .x_idempotency_key(x_idempotency_key)
+        .x_wallet_auth(x_wallet_auth)
+        .body(body)
+        .send()
+        .await;
+    ```*/
+    pub fn redeem_vault_fees_with_evm_account(&self) -> builder::RedeemVaultFeesWithEvmAccount<'_> {
+        builder::RedeemVaultFeesWithEvmAccount::new(self)
+    }
     /**Send transaction
 
     Signs a transaction with the given EVM account and sends it to the indicated supported network. This API handles nonce management and gas estimation, leaving the developer to provide only the minimal set of fields necessary to send the transaction. The transaction should be serialized as a hex string using [RLP](https://ethereum.org/en/developers/docs/data-structures-and-encoding/rlp/).
@@ -197576,6 +201991,40 @@ impl Client {
     pub fn update_evm_smart_account(&self) -> builder::UpdateEvmSmartAccount<'_> {
         builder::UpdateEvmSmartAccount::new(self)
     }
+    /**Redeem vault fees with an EVM Smart Account
+
+    Redeems every vault share held by the vault's fee recipient EVM Smart Account for the vault's underlying asset (e.g. USDC). The Smart Account must be the vault's fee recipient, and its owner must be a CDP EVM account.
+    CDP periodically distributes each vault's accrued fees to its fee recipient as vault shares. This API redeems the Smart Account's full share balance, including any shares from the Smart Account's own deposits into the vault, so use a dedicated fee recipient Smart Account.
+    The share approval and redemption are batched into a single user operation.
+    For fee recipients that are EVM accounts, use `redeemVaultFeesWithEvmAccount` instead.
+
+    Sends a `POST` request to `/v2/evm/smart-accounts/{address}/lend/redeem-fees`
+
+    Arguments:
+    - `address`: The 0x-prefixed address of the EVM Smart Account that is the vault's fee recipient.
+    - `x_idempotency_key`: An optional string request header for making requests safely retryable.
+    When included, duplicate requests with the same key will return identical responses.
+    Refer to our [Idempotency docs](https://docs.cdp.coinbase.com/api-reference/v2/idempotency) for more information on using idempotency keys.
+
+    - `x_wallet_auth`: A JWT signed using your Wallet Secret, encoded in base64. Refer to the
+    [Generate Wallet Token](https://docs.cdp.coinbase.com/api-reference/v2/authentication#2-generate-wallet-token)
+    section of our Authentication docs for more details on how to generate your Wallet Token.
+
+    - `body`
+    ```ignore
+    let response = client.redeem_vault_fees_with_evm_smart_account()
+        .address(address)
+        .x_idempotency_key(x_idempotency_key)
+        .x_wallet_auth(x_wallet_auth)
+        .body(body)
+        .send()
+        .await;
+    ```*/
+    pub fn redeem_vault_fees_with_evm_smart_account(
+        &self,
+    ) -> builder::RedeemVaultFeesWithEvmSmartAccount<'_> {
+        builder::RedeemVaultFeesWithEvmSmartAccount::new(self)
+    }
     /**Create spend permission
 
     Creates a spend permission for the given smart account address.
@@ -197820,6 +202269,42 @@ impl Client {
     ```*/
     pub fn list_evm_token_balances(&self) -> builder::ListEvmTokenBalances<'_> {
         builder::ListEvmTokenBalances::new(self)
+    }
+    /**List vaults
+
+    Lists the vaults created by the project in the CDP Portal. Use `pageSize` and `pageToken` to page through the results. Each vault includes its current metrics, when a metrics snapshot has been observed for it.
+
+    Sends a `GET` request to `/v2/lend/vaults`
+
+    Arguments:
+    - `page_size`: The number of vaults to return per page.
+    - `page_token`: The token for the next page of resources, if any.
+    ```ignore
+    let response = client.list_vaults()
+        .page_size(page_size)
+        .page_token(page_token)
+        .send()
+        .await;
+    ```*/
+    pub fn list_vaults(&self) -> builder::ListVaults<'_> {
+        builder::ListVaults::new(self)
+    }
+    /**Get a vault
+
+    Retrieves a vault created by the project in the CDP Portal, including its current metrics such as APY and TVL.
+
+    Sends a `GET` request to `/v2/lend/vaults/{vaultId}`
+
+    Arguments:
+    - `vault_id`: The ID of the vault to retrieve.
+    ```ignore
+    let response = client.get_vault()
+        .vault_id(vault_id)
+        .send()
+        .await;
+    ```*/
+    pub fn get_vault(&self) -> builder::GetVault<'_> {
+        builder::GetVault::new(self)
     }
     /**List mandates
 
@@ -198140,6 +202625,81 @@ impl Client {
     ```*/
     pub fn request_limits_upgrade(&self) -> builder::RequestLimitsUpgrade<'_> {
         builder::RequestLimitsUpgrade::new(self)
+    }
+    /**Create an onramp iOS attestation challenge
+
+    Issues a one-time challenge for the iOS App Attest device-key **registration** step. Authenticate with a CDP API key. Call this from the partner backend and pass the challenge to the mobile app; do not embed the API key in the client. The project is identified by the API key JWT. The partner app then passes the challenge to `DCAppAttestService.attestKey(keyId, clientDataHash: SHA256(challenge))` and submits the resulting attestation to [Register Onramp iOS Attestation](#operation/registerOnrampIosAttestation).
+
+    This is distinct from [Create Onramp Mobile Challenge](#operation/createOnrampMobileChallenge), which issues the per-transaction session challenge. Registration is a one-time, per-device-install operation; iOS-only (Android validates Play Integrity inline per request and has no registration step).
+
+    Sends a `POST` request to `/v2/onramp/mobile/attestation/challenges`
+
+    ```ignore
+    let response = client.create_onramp_ios_attestation_challenge()
+        .send()
+        .await;
+    ```*/
+    pub fn create_onramp_ios_attestation_challenge(
+        &self,
+    ) -> builder::CreateOnrampIosAttestationChallenge<'_> {
+        builder::CreateOnrampIosAttestationChallenge::new(self)
+    }
+    /**Register a device key for iOS App Attest
+
+    Verifies an iOS App Attest attestation payload and registers the device's public key for future assertion validation. The server checks that the attestation is genuine and signed by Apple, that the bundle ID is in the partner's allowed mobile clients list, and that the challenge issued by [Create Onramp iOS Attestation Challenge](#operation/createOnrampIosAttestationChallenge) is fresh and unused.
+
+    This is a one-time, per-device-install operation; iOS-only (Android validates Play Integrity inline per request and has no registration step). For security, all client-side verification failures are returned as an opaque `400 invalid_request` — the response never reveals which specific check failed.
+
+    The Apple App Attest `keyId` is supplied only in the request body (`ios.keyId`). Do not put `keyId` in the URL — App Attest key IDs are standard base64 and frequently contain `/`, which breaks path routing at the edge.
+
+    Idempotency is provided by `ios.keyId` itself: the server upserts the device public key on `(app, keyId)`, so repeating registration for the same key replaces the stored public key rather than creating a duplicate. This endpoint does not accept `X-Idempotency-Key` — `ios.keyId` is the natural idempotency key for the registration resource. The challenge remains single-use and is claimed on first receipt. The challenge identifies the project; the device does not supply a CDP project ID.
+
+    Sends a `POST` request to `/v2/onramp/mobile/attestation/registrations`
+
+    ```ignore
+    let response = client.register_onramp_ios_attestation()
+        .body(body)
+        .send()
+        .await;
+    ```*/
+    pub fn register_onramp_ios_attestation(&self) -> builder::RegisterOnrampIosAttestation<'_> {
+        builder::RegisterOnrampIosAttestation::new(self)
+    }
+    /**Create an onramp mobile session
+
+    Verifies the platform attestation for a challenge issued by [Create Onramp Mobile Challenge](#operation/createOnrampMobileChallenge) and returns a ready-to-use onramp URL. The URL embeds the session token as a query parameter so the Coinbase app can populate the handoff screen immediately on launch.
+
+    This endpoint is idempotent on the challenge token: if the same challenge is submitted again (e.g. due to a lost response), the server returns the original session URL rather than an error.
+
+    Provide exactly one platform payload: `ios` (App Attest assertion) or `android` (Play Integrity token).
+
+    Sends a `POST` request to `/v2/onramp/mobile/sessions`
+
+    ```ignore
+    let response = client.create_onramp_mobile_session()
+        .body(body)
+        .send()
+        .await;
+    ```*/
+    pub fn create_onramp_mobile_session(&self) -> builder::CreateOnrampMobileSession<'_> {
+        builder::CreateOnrampMobileSession::new(self)
+    }
+    /**Create an onramp mobile challenge
+
+    Issues a challenge for initiating an onramp flow from a partner mobile app. Authenticate this request from the partner backend with a CDP API key; do not embed the API key in the mobile client. The project is identified by the API key JWT.
+
+    Pass the challenge to the mobile app. The app signs it using platform attestation (iOS App Attest or Android Play Integrity) and submits it to the [Create Onramp Mobile Session](#operation/createOnrampMobileSession) endpoint without CDP API key authentication to obtain a ready-to-use onramp URL. The `redirectUrl` is required so the Coinbase app knows where to return the user after completing or dismissing the transaction.
+
+    Sends a `POST` request to `/v2/onramp/mobile/sessions/challenges`
+
+    ```ignore
+    let response = client.create_onramp_mobile_challenge()
+        .body(body)
+        .send()
+        .await;
+    ```*/
+    pub fn create_onramp_mobile_challenge(&self) -> builder::CreateOnrampMobileChallenge<'_> {
+        builder::CreateOnrampMobileChallenge::new(self)
     }
     /**Create an onramp order
 
@@ -198919,6 +203479,52 @@ impl Client {
     ```*/
     pub fn delete_policy(&self) -> builder::DeletePolicy<'_> {
         builder::DeletePolicy::new(self)
+    }
+    /**Pause policy
+
+    Pause a policy so it is skipped during evaluation as if it were not attached. The policy keeps its ID, scope, and rules. If already paused, this returns the policy with the original pausedAt and replaces resumeAt with the requested time, or clears resumeAt if no time is supplied.
+
+    Sends a `POST` request to `/v2/policy-engine/policies/{policyId}/pause`
+
+    Arguments:
+    - `policy_id`: The ID of the policy to pause.
+    - `x_idempotency_key`: An optional string request header for making requests safely retryable.
+    When included, duplicate requests with the same key will return identical responses.
+    Refer to our [Idempotency docs](https://docs.cdp.coinbase.com/api-reference/v2/idempotency) for more information on using idempotency keys.
+
+    - `body`
+    ```ignore
+    let response = client.pause_policy()
+        .policy_id(policy_id)
+        .x_idempotency_key(x_idempotency_key)
+        .body(body)
+        .send()
+        .await;
+    ```*/
+    pub fn pause_policy(&self) -> builder::PausePolicy<'_> {
+        builder::PausePolicy::new(self)
+    }
+    /**Resume policy
+
+    Resume a paused policy so its existing ID, scope, and rules are immediately enforced again. Resuming an active policy returns it unchanged.
+
+    Sends a `POST` request to `/v2/policy-engine/policies/{policyId}/resume`
+
+    Arguments:
+    - `policy_id`: The ID of the policy to resume.
+    - `x_idempotency_key`: An optional string request header for making requests safely retryable.
+    When included, duplicate requests with the same key will return identical responses.
+    Refer to our [Idempotency docs](https://docs.cdp.coinbase.com/api-reference/v2/idempotency) for more information on using idempotency keys.
+
+    ```ignore
+    let response = client.resume_policy()
+        .policy_id(policy_id)
+        .x_idempotency_key(x_idempotency_key)
+        .send()
+        .await;
+    ```*/
+    pub fn resume_policy(&self) -> builder::ResumePolicy<'_> {
+        builder::ResumePolicy::new(self)
     }
     /**Simulate policies
 
@@ -209628,6 +214234,152 @@ pub mod builder {
             }
         }
     }
+    /**Builder for [`Client::redeem_vault_fees_with_evm_account`]
+
+    [`Client::redeem_vault_fees_with_evm_account`]: super::Client::redeem_vault_fees_with_evm_account*/
+    #[derive(Debug, Clone)]
+    pub struct RedeemVaultFeesWithEvmAccount<'a> {
+        client: &'a super::Client,
+        address: Result<types::RedeemVaultFeesWithEvmAccountAddress, String>,
+        x_idempotency_key:
+            Result<Option<types::RedeemVaultFeesWithEvmAccountXIdempotencyKey>, String>,
+        x_wallet_auth: Result<::std::string::String, String>,
+        body: Result<types::EoaVaultRedeemFeesRequest, String>,
+    }
+    impl<'a> RedeemVaultFeesWithEvmAccount<'a> {
+        pub fn new(client: &'a super::Client) -> Self {
+            Self {
+                client: client,
+                address: Err("address was not initialized".to_string()),
+                x_idempotency_key: Ok(None),
+                x_wallet_auth: Err("x_wallet_auth was not initialized".to_string()),
+                body: Err("body was not initialized".to_string()),
+            }
+        }
+        pub fn address<V>(mut self, value: V) -> Self
+        where
+            V: std::convert::TryInto<types::RedeemVaultFeesWithEvmAccountAddress>,
+        {
+            self.address = value.try_into().map_err(|_| {
+                "conversion to `RedeemVaultFeesWithEvmAccountAddress` for address failed"
+                    .to_string()
+            });
+            self
+        }
+        pub fn x_idempotency_key<V>(mut self, value: V) -> Self
+        where
+            V: std::convert::TryInto<types::RedeemVaultFeesWithEvmAccountXIdempotencyKey>,
+        {
+            self.x_idempotency_key = value
+                .try_into()
+                .map(Some)
+                .map_err(|_| {
+                    "conversion to `RedeemVaultFeesWithEvmAccountXIdempotencyKey` for x_idempotency_key failed"
+                        .to_string()
+                });
+            self
+        }
+        pub fn x_wallet_auth<V>(mut self, value: V) -> Self
+        where
+            V: std::convert::TryInto<::std::string::String>,
+        {
+            self.x_wallet_auth = value.try_into().map_err(|_| {
+                "conversion to `:: std :: string :: String` for x_wallet_auth failed".to_string()
+            });
+            self
+        }
+        pub fn body<V>(mut self, value: V) -> Self
+        where
+            V: std::convert::TryInto<types::EoaVaultRedeemFeesRequest>,
+        {
+            self.body = value.try_into().map_err(|_| {
+                "conversion to `EoaVaultRedeemFeesRequest` for body failed".to_string()
+            });
+            self
+        }
+        ///Sends a `POST` request to `/v2/evm/accounts/{address}/lend/redeem-fees`
+        pub async fn send(
+            self,
+        ) -> Result<ResponseValue<types::EoaVaultRedeemFeesResponse>, Error<types::Error>> {
+            let Self {
+                client,
+                address,
+                x_idempotency_key,
+                x_wallet_auth,
+                body,
+            } = self;
+            let address = address.map_err(Error::InvalidRequest)?;
+            let x_idempotency_key = x_idempotency_key.map_err(Error::InvalidRequest)?;
+            let x_wallet_auth = x_wallet_auth.map_err(Error::InvalidRequest)?;
+            let body = body.map_err(Error::InvalidRequest)?;
+            let url = format!(
+                "{}/v2/evm/accounts/{}/lend/redeem-fees",
+                client.baseurl,
+                encode_path(&address.to_string()),
+            );
+            let mut header_map = ::reqwest::header::HeaderMap::with_capacity(3usize);
+            header_map.append(
+                ::reqwest::header::HeaderName::from_static("api-version"),
+                ::reqwest::header::HeaderValue::from_static(super::Client::api_version()),
+            );
+            if let Some(value) = x_idempotency_key {
+                header_map.append("X-Idempotency-Key", value.to_string().try_into()?);
+            }
+            header_map.append("X-Wallet-Auth", x_wallet_auth.to_string().try_into()?);
+            #[allow(unused_mut)]
+            let mut request = client
+                .client
+                .post(url)
+                .header(
+                    ::reqwest::header::ACCEPT,
+                    ::reqwest::header::HeaderValue::from_static("application/json"),
+                )
+                .json(&body)
+                .headers(header_map)
+                .build()?;
+            let info = OperationInfo {
+                operation_id: "redeem_vault_fees_with_evm_account",
+            };
+            client.pre(&mut request, &info).await?;
+            let result = client.exec(request, &info).await;
+            client.post(&result, &info).await?;
+            let response = result?;
+            match response.status().as_u16() {
+                200u16 => ResponseValue::from_response::<types::Error>(response).await,
+                400u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                401u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                402u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                403u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                404u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                409u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                422u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                500u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                502u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                503u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                _ => Err(Error::UnexpectedResponse(response)),
+            }
+        }
+    }
     /**Builder for [`Client::send_evm_transaction`]
 
     [`Client::send_evm_transaction`]: super::Client::send_evm_transaction*/
@@ -211041,6 +215793,172 @@ pub mod builder {
             }
         }
     }
+    /**Builder for [`Client::redeem_vault_fees_with_evm_smart_account`]
+
+    [`Client::redeem_vault_fees_with_evm_smart_account`]: super::Client::redeem_vault_fees_with_evm_smart_account*/
+    #[derive(Debug, Clone)]
+    pub struct RedeemVaultFeesWithEvmSmartAccount<'a> {
+        client: &'a super::Client,
+        address: Result<types::RedeemVaultFeesWithEvmSmartAccountAddress, String>,
+        x_idempotency_key:
+            Result<Option<types::RedeemVaultFeesWithEvmSmartAccountXIdempotencyKey>, String>,
+        x_wallet_auth: Result<::std::string::String, String>,
+        body: Result<types::builder::SmartAccountVaultRedeemFeesRequest, String>,
+    }
+    impl<'a> RedeemVaultFeesWithEvmSmartAccount<'a> {
+        pub fn new(client: &'a super::Client) -> Self {
+            Self {
+                client: client,
+                address: Err("address was not initialized".to_string()),
+                x_idempotency_key: Ok(None),
+                x_wallet_auth: Err("x_wallet_auth was not initialized".to_string()),
+                body: Ok(::std::default::Default::default()),
+            }
+        }
+        pub fn address<V>(mut self, value: V) -> Self
+        where
+            V: std::convert::TryInto<types::RedeemVaultFeesWithEvmSmartAccountAddress>,
+        {
+            self.address = value.try_into().map_err(|_| {
+                "conversion to `RedeemVaultFeesWithEvmSmartAccountAddress` for address failed"
+                    .to_string()
+            });
+            self
+        }
+        pub fn x_idempotency_key<V>(mut self, value: V) -> Self
+        where
+            V: std::convert::TryInto<types::RedeemVaultFeesWithEvmSmartAccountXIdempotencyKey>,
+        {
+            self.x_idempotency_key = value
+                .try_into()
+                .map(Some)
+                .map_err(|_| {
+                    "conversion to `RedeemVaultFeesWithEvmSmartAccountXIdempotencyKey` for x_idempotency_key failed"
+                        .to_string()
+                });
+            self
+        }
+        pub fn x_wallet_auth<V>(mut self, value: V) -> Self
+        where
+            V: std::convert::TryInto<::std::string::String>,
+        {
+            self.x_wallet_auth = value.try_into().map_err(|_| {
+                "conversion to `:: std :: string :: String` for x_wallet_auth failed".to_string()
+            });
+            self
+        }
+        pub fn body<V>(mut self, value: V) -> Self
+        where
+            V: std::convert::TryInto<types::SmartAccountVaultRedeemFeesRequest>,
+            <V as std::convert::TryInto<types::SmartAccountVaultRedeemFeesRequest>>::Error:
+                std::fmt::Display,
+        {
+            self.body = value.try_into().map(From::from).map_err(|s| {
+                format!(
+                    "conversion to `SmartAccountVaultRedeemFeesRequest` for body failed: {}",
+                    s
+                )
+            });
+            self
+        }
+        pub fn body_map<F>(mut self, f: F) -> Self
+        where
+            F: std::ops::FnOnce(
+                types::builder::SmartAccountVaultRedeemFeesRequest,
+            ) -> types::builder::SmartAccountVaultRedeemFeesRequest,
+        {
+            self.body = self.body.map(f);
+            self
+        }
+        ///Sends a `POST` request to `/v2/evm/smart-accounts/{address}/lend/redeem-fees`
+        pub async fn send(
+            self,
+        ) -> Result<ResponseValue<types::SmartAccountVaultRedeemFeesResponse>, Error<types::Error>>
+        {
+            let Self {
+                client,
+                address,
+                x_idempotency_key,
+                x_wallet_auth,
+                body,
+            } = self;
+            let address = address.map_err(Error::InvalidRequest)?;
+            let x_idempotency_key = x_idempotency_key.map_err(Error::InvalidRequest)?;
+            let x_wallet_auth = x_wallet_auth.map_err(Error::InvalidRequest)?;
+            let body = body
+                .and_then(|v| {
+                    types::SmartAccountVaultRedeemFeesRequest::try_from(v)
+                        .map_err(|e| e.to_string())
+                })
+                .map_err(Error::InvalidRequest)?;
+            let url = format!(
+                "{}/v2/evm/smart-accounts/{}/lend/redeem-fees",
+                client.baseurl,
+                encode_path(&address.to_string()),
+            );
+            let mut header_map = ::reqwest::header::HeaderMap::with_capacity(3usize);
+            header_map.append(
+                ::reqwest::header::HeaderName::from_static("api-version"),
+                ::reqwest::header::HeaderValue::from_static(super::Client::api_version()),
+            );
+            if let Some(value) = x_idempotency_key {
+                header_map.append("X-Idempotency-Key", value.to_string().try_into()?);
+            }
+            header_map.append("X-Wallet-Auth", x_wallet_auth.to_string().try_into()?);
+            #[allow(unused_mut)]
+            let mut request = client
+                .client
+                .post(url)
+                .header(
+                    ::reqwest::header::ACCEPT,
+                    ::reqwest::header::HeaderValue::from_static("application/json"),
+                )
+                .json(&body)
+                .headers(header_map)
+                .build()?;
+            let info = OperationInfo {
+                operation_id: "redeem_vault_fees_with_evm_smart_account",
+            };
+            client.pre(&mut request, &info).await?;
+            let result = client.exec(request, &info).await;
+            client.post(&result, &info).await?;
+            let response = result?;
+            match response.status().as_u16() {
+                200u16 => ResponseValue::from_response::<types::Error>(response).await,
+                400u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                401u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                402u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                403u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                404u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                409u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                422u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                500u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                502u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                503u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                _ => Err(Error::UnexpectedResponse(response)),
+            }
+        }
+    }
     /**Builder for [`Client::create_spend_permission`]
 
     [`Client::create_spend_permission`]: super::Client::create_spend_permission*/
@@ -212386,6 +217304,173 @@ pub mod builder {
                     ResponseValue::from_response(response).await?,
                 )),
                 502u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                503u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                _ => Err(Error::UnexpectedResponse(response)),
+            }
+        }
+    }
+    /**Builder for [`Client::list_vaults`]
+
+    [`Client::list_vaults`]: super::Client::list_vaults*/
+    #[derive(Debug, Clone)]
+    pub struct ListVaults<'a> {
+        client: &'a super::Client,
+        page_size: Result<Option<::std::num::NonZeroU64>, String>,
+        page_token: Result<Option<::std::string::String>, String>,
+    }
+    impl<'a> ListVaults<'a> {
+        pub fn new(client: &'a super::Client) -> Self {
+            Self {
+                client: client,
+                page_size: Ok(None),
+                page_token: Ok(None),
+            }
+        }
+        pub fn page_size<V>(mut self, value: V) -> Self
+        where
+            V: std::convert::TryInto<::std::num::NonZeroU64>,
+        {
+            self.page_size = value.try_into().map(Some).map_err(|_| {
+                "conversion to `:: std :: num :: NonZeroU64` for page_size failed".to_string()
+            });
+            self
+        }
+        pub fn page_token<V>(mut self, value: V) -> Self
+        where
+            V: std::convert::TryInto<::std::string::String>,
+        {
+            self.page_token = value.try_into().map(Some).map_err(|_| {
+                "conversion to `:: std :: string :: String` for page_token failed".to_string()
+            });
+            self
+        }
+        ///Sends a `GET` request to `/v2/lend/vaults`
+        pub async fn send(
+            self,
+        ) -> Result<ResponseValue<types::ListVaultsResponse>, Error<types::Error>> {
+            let Self {
+                client,
+                page_size,
+                page_token,
+            } = self;
+            let page_size = page_size.map_err(Error::InvalidRequest)?;
+            let page_token = page_token.map_err(Error::InvalidRequest)?;
+            let url = format!("{}/v2/lend/vaults", client.baseurl,);
+            let mut header_map = ::reqwest::header::HeaderMap::with_capacity(1usize);
+            header_map.append(
+                ::reqwest::header::HeaderName::from_static("api-version"),
+                ::reqwest::header::HeaderValue::from_static(super::Client::api_version()),
+            );
+            #[allow(unused_mut)]
+            let mut request = client
+                .client
+                .get(url)
+                .header(
+                    ::reqwest::header::ACCEPT,
+                    ::reqwest::header::HeaderValue::from_static("application/json"),
+                )
+                .query(&progenitor_middleware_client::QueryParam::new(
+                    "pageSize", &page_size,
+                ))
+                .query(&progenitor_middleware_client::QueryParam::new(
+                    "pageToken",
+                    &page_token,
+                ))
+                .headers(header_map)
+                .build()?;
+            let info = OperationInfo {
+                operation_id: "list_vaults",
+            };
+            client.pre(&mut request, &info).await?;
+            let result = client.exec(request, &info).await;
+            client.post(&result, &info).await?;
+            let response = result?;
+            match response.status().as_u16() {
+                200u16 => ResponseValue::from_response::<types::Error>(response).await,
+                400u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                401u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                500u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                503u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                _ => Err(Error::UnexpectedResponse(response)),
+            }
+        }
+    }
+    /**Builder for [`Client::get_vault`]
+
+    [`Client::get_vault`]: super::Client::get_vault*/
+    #[derive(Debug, Clone)]
+    pub struct GetVault<'a> {
+        client: &'a super::Client,
+        vault_id: Result<types::VaultId, String>,
+    }
+    impl<'a> GetVault<'a> {
+        pub fn new(client: &'a super::Client) -> Self {
+            Self {
+                client: client,
+                vault_id: Err("vault_id was not initialized".to_string()),
+            }
+        }
+        pub fn vault_id<V>(mut self, value: V) -> Self
+        where
+            V: std::convert::TryInto<types::VaultId>,
+        {
+            self.vault_id = value
+                .try_into()
+                .map_err(|_| "conversion to `VaultId` for vault_id failed".to_string());
+            self
+        }
+        ///Sends a `GET` request to `/v2/lend/vaults/{vaultId}`
+        pub async fn send(self) -> Result<ResponseValue<types::Vault>, Error<types::Error>> {
+            let Self { client, vault_id } = self;
+            let vault_id = vault_id.map_err(Error::InvalidRequest)?;
+            let url = format!(
+                "{}/v2/lend/vaults/{}",
+                client.baseurl,
+                encode_path(&vault_id.to_string()),
+            );
+            let mut header_map = ::reqwest::header::HeaderMap::with_capacity(1usize);
+            header_map.append(
+                ::reqwest::header::HeaderName::from_static("api-version"),
+                ::reqwest::header::HeaderValue::from_static(super::Client::api_version()),
+            );
+            #[allow(unused_mut)]
+            let mut request = client
+                .client
+                .get(url)
+                .header(
+                    ::reqwest::header::ACCEPT,
+                    ::reqwest::header::HeaderValue::from_static("application/json"),
+                )
+                .headers(header_map)
+                .build()?;
+            let info = OperationInfo {
+                operation_id: "get_vault",
+            };
+            client.pre(&mut request, &info).await?;
+            let result = client.exec(request, &info).await;
+            client.post(&result, &info).await?;
+            let response = result?;
+            match response.status().as_u16() {
+                200u16 => ResponseValue::from_response::<types::Error>(response).await,
+                401u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                404u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                500u16 => Err(Error::ErrorResponse(
                     ResponseValue::from_response(response).await?,
                 )),
                 503u16 => Err(Error::ErrorResponse(
@@ -213931,6 +219016,326 @@ pub mod builder {
                     ResponseValue::from_response(response).await?,
                 )),
                 500u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                _ => Err(Error::UnexpectedResponse(response)),
+            }
+        }
+    }
+    /**Builder for [`Client::create_onramp_ios_attestation_challenge`]
+
+    [`Client::create_onramp_ios_attestation_challenge`]: super::Client::create_onramp_ios_attestation_challenge*/
+    #[derive(Debug, Clone)]
+    pub struct CreateOnrampIosAttestationChallenge<'a> {
+        client: &'a super::Client,
+    }
+    impl<'a> CreateOnrampIosAttestationChallenge<'a> {
+        pub fn new(client: &'a super::Client) -> Self {
+            Self { client: client }
+        }
+        ///Sends a `POST` request to `/v2/onramp/mobile/attestation/challenges`
+        pub async fn send(
+            self,
+        ) -> Result<ResponseValue<types::IosAttestationChallenge>, Error<types::Error>> {
+            let Self { client } = self;
+            let url = format!("{}/v2/onramp/mobile/attestation/challenges", client.baseurl,);
+            let mut header_map = ::reqwest::header::HeaderMap::with_capacity(1usize);
+            header_map.append(
+                ::reqwest::header::HeaderName::from_static("api-version"),
+                ::reqwest::header::HeaderValue::from_static(super::Client::api_version()),
+            );
+            #[allow(unused_mut)]
+            let mut request = client
+                .client
+                .post(url)
+                .header(
+                    ::reqwest::header::ACCEPT,
+                    ::reqwest::header::HeaderValue::from_static("application/json"),
+                )
+                .headers(header_map)
+                .build()?;
+            let info = OperationInfo {
+                operation_id: "create_onramp_ios_attestation_challenge",
+            };
+            client.pre(&mut request, &info).await?;
+            let result = client.exec(request, &info).await;
+            client.post(&result, &info).await?;
+            let response = result?;
+            match response.status().as_u16() {
+                201u16 => ResponseValue::from_response::<types::Error>(response).await,
+                401u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                403u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                429u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                500u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                _ => Err(Error::UnexpectedResponse(response)),
+            }
+        }
+    }
+    /**Builder for [`Client::register_onramp_ios_attestation`]
+
+    [`Client::register_onramp_ios_attestation`]: super::Client::register_onramp_ios_attestation*/
+    #[derive(Debug, Clone)]
+    pub struct RegisterOnrampIosAttestation<'a> {
+        client: &'a super::Client,
+        body: Result<types::builder::IosAttestationRegistrationRequest, String>,
+    }
+    impl<'a> RegisterOnrampIosAttestation<'a> {
+        pub fn new(client: &'a super::Client) -> Self {
+            Self {
+                client: client,
+                body: Ok(::std::default::Default::default()),
+            }
+        }
+        pub fn body<V>(mut self, value: V) -> Self
+        where
+            V: std::convert::TryInto<types::IosAttestationRegistrationRequest>,
+            <V as std::convert::TryInto<types::IosAttestationRegistrationRequest>>::Error:
+                std::fmt::Display,
+        {
+            self.body = value.try_into().map(From::from).map_err(|s| {
+                format!(
+                    "conversion to `IosAttestationRegistrationRequest` for body failed: {}",
+                    s
+                )
+            });
+            self
+        }
+        pub fn body_map<F>(mut self, f: F) -> Self
+        where
+            F: std::ops::FnOnce(
+                types::builder::IosAttestationRegistrationRequest,
+            ) -> types::builder::IosAttestationRegistrationRequest,
+        {
+            self.body = self.body.map(f);
+            self
+        }
+        ///Sends a `POST` request to `/v2/onramp/mobile/attestation/registrations`
+        pub async fn send(
+            self,
+        ) -> Result<ResponseValue<types::IosAttestationRegistrationResponse>, Error<types::Error>>
+        {
+            let Self { client, body } = self;
+            let body = body
+                .and_then(|v| {
+                    types::IosAttestationRegistrationRequest::try_from(v).map_err(|e| e.to_string())
+                })
+                .map_err(Error::InvalidRequest)?;
+            let url = format!(
+                "{}/v2/onramp/mobile/attestation/registrations",
+                client.baseurl,
+            );
+            let mut header_map = ::reqwest::header::HeaderMap::with_capacity(1usize);
+            header_map.append(
+                ::reqwest::header::HeaderName::from_static("api-version"),
+                ::reqwest::header::HeaderValue::from_static(super::Client::api_version()),
+            );
+            #[allow(unused_mut)]
+            let mut request = client
+                .client
+                .post(url)
+                .header(
+                    ::reqwest::header::ACCEPT,
+                    ::reqwest::header::HeaderValue::from_static("application/json"),
+                )
+                .json(&body)
+                .headers(header_map)
+                .build()?;
+            let info = OperationInfo {
+                operation_id: "register_onramp_ios_attestation",
+            };
+            client.pre(&mut request, &info).await?;
+            let result = client.exec(request, &info).await;
+            client.post(&result, &info).await?;
+            let response = result?;
+            match response.status().as_u16() {
+                200u16 => ResponseValue::from_response::<types::Error>(response).await,
+                400u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                429u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                500u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                _ => Err(Error::UnexpectedResponse(response)),
+            }
+        }
+    }
+    /**Builder for [`Client::create_onramp_mobile_session`]
+
+    [`Client::create_onramp_mobile_session`]: super::Client::create_onramp_mobile_session*/
+    #[derive(Debug, Clone)]
+    pub struct CreateOnrampMobileSession<'a> {
+        client: &'a super::Client,
+        body: Result<types::CreateOnrampMobileSessionRequest, String>,
+    }
+    impl<'a> CreateOnrampMobileSession<'a> {
+        pub fn new(client: &'a super::Client) -> Self {
+            Self {
+                client: client,
+                body: Err("body was not initialized".to_string()),
+            }
+        }
+        pub fn body<V>(mut self, value: V) -> Self
+        where
+            V: std::convert::TryInto<types::CreateOnrampMobileSessionRequest>,
+        {
+            self.body = value.try_into().map_err(|_| {
+                "conversion to `CreateOnrampMobileSessionRequest` for body failed".to_string()
+            });
+            self
+        }
+        ///Sends a `POST` request to `/v2/onramp/mobile/sessions`
+        pub async fn send(
+            self,
+        ) -> Result<ResponseValue<types::CreateOnrampMobileSessionResponse>, Error<types::Error>>
+        {
+            let Self { client, body } = self;
+            let body = body.map_err(Error::InvalidRequest)?;
+            let url = format!("{}/v2/onramp/mobile/sessions", client.baseurl,);
+            let mut header_map = ::reqwest::header::HeaderMap::with_capacity(1usize);
+            header_map.append(
+                ::reqwest::header::HeaderName::from_static("api-version"),
+                ::reqwest::header::HeaderValue::from_static(super::Client::api_version()),
+            );
+            #[allow(unused_mut)]
+            let mut request = client
+                .client
+                .post(url)
+                .header(
+                    ::reqwest::header::ACCEPT,
+                    ::reqwest::header::HeaderValue::from_static("application/json"),
+                )
+                .json(&body)
+                .headers(header_map)
+                .build()?;
+            let info = OperationInfo {
+                operation_id: "create_onramp_mobile_session",
+            };
+            client.pre(&mut request, &info).await?;
+            let result = client.exec(request, &info).await;
+            client.post(&result, &info).await?;
+            let response = result?;
+            match response.status().as_u16() {
+                201u16 => ResponseValue::from_response::<types::Error>(response).await,
+                400u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                403u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                422u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                429u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                500u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                503u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                _ => Err(Error::UnexpectedResponse(response)),
+            }
+        }
+    }
+    /**Builder for [`Client::create_onramp_mobile_challenge`]
+
+    [`Client::create_onramp_mobile_challenge`]: super::Client::create_onramp_mobile_challenge*/
+    #[derive(Debug, Clone)]
+    pub struct CreateOnrampMobileChallenge<'a> {
+        client: &'a super::Client,
+        body: Result<types::builder::OnrampSessionRequest, String>,
+    }
+    impl<'a> CreateOnrampMobileChallenge<'a> {
+        pub fn new(client: &'a super::Client) -> Self {
+            Self {
+                client: client,
+                body: Ok(::std::default::Default::default()),
+            }
+        }
+        pub fn body<V>(mut self, value: V) -> Self
+        where
+            V: std::convert::TryInto<types::OnrampSessionRequest>,
+            <V as std::convert::TryInto<types::OnrampSessionRequest>>::Error: std::fmt::Display,
+        {
+            self.body = value.try_into().map(From::from).map_err(|s| {
+                format!(
+                    "conversion to `OnrampSessionRequest` for body failed: {}",
+                    s
+                )
+            });
+            self
+        }
+        pub fn body_map<F>(mut self, f: F) -> Self
+        where
+            F: std::ops::FnOnce(
+                types::builder::OnrampSessionRequest,
+            ) -> types::builder::OnrampSessionRequest,
+        {
+            self.body = self.body.map(f);
+            self
+        }
+        ///Sends a `POST` request to `/v2/onramp/mobile/sessions/challenges`
+        pub async fn send(
+            self,
+        ) -> Result<ResponseValue<types::OnrampMobileChallenge>, Error<types::Error>> {
+            let Self { client, body } = self;
+            let body = body
+                .and_then(|v| types::OnrampSessionRequest::try_from(v).map_err(|e| e.to_string()))
+                .map_err(Error::InvalidRequest)?;
+            let url = format!("{}/v2/onramp/mobile/sessions/challenges", client.baseurl,);
+            let mut header_map = ::reqwest::header::HeaderMap::with_capacity(1usize);
+            header_map.append(
+                ::reqwest::header::HeaderName::from_static("api-version"),
+                ::reqwest::header::HeaderValue::from_static(super::Client::api_version()),
+            );
+            #[allow(unused_mut)]
+            let mut request = client
+                .client
+                .post(url)
+                .header(
+                    ::reqwest::header::ACCEPT,
+                    ::reqwest::header::HeaderValue::from_static("application/json"),
+                )
+                .json(&body)
+                .headers(header_map)
+                .build()?;
+            let info = OperationInfo {
+                operation_id: "create_onramp_mobile_challenge",
+            };
+            client.pre(&mut request, &info).await?;
+            let result = client.exec(request, &info).await;
+            client.post(&result, &info).await?;
+            let response = result?;
+            match response.status().as_u16() {
+                201u16 => ResponseValue::from_response::<types::Error>(response).await,
+                400u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                401u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                403u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                429u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                500u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                503u16 => Err(Error::ErrorResponse(
                     ResponseValue::from_response(response).await?,
                 )),
                 _ => Err(Error::UnexpectedResponse(response)),
@@ -217520,6 +222925,231 @@ pub mod builder {
                     ResponseValue::from_response(response).await?,
                 )),
                 409u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                422u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                500u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                502u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                503u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                _ => Err(Error::UnexpectedResponse(response)),
+            }
+        }
+    }
+    /**Builder for [`Client::pause_policy`]
+
+    [`Client::pause_policy`]: super::Client::pause_policy*/
+    #[derive(Debug, Clone)]
+    pub struct PausePolicy<'a> {
+        client: &'a super::Client,
+        policy_id: Result<types::PausePolicyPolicyId, String>,
+        x_idempotency_key: Result<Option<types::PausePolicyXIdempotencyKey>, String>,
+        body: Result<types::builder::PausePolicyRequest, String>,
+    }
+    impl<'a> PausePolicy<'a> {
+        pub fn new(client: &'a super::Client) -> Self {
+            Self {
+                client: client,
+                policy_id: Err("policy_id was not initialized".to_string()),
+                x_idempotency_key: Ok(None),
+                body: Ok(::std::default::Default::default()),
+            }
+        }
+        pub fn policy_id<V>(mut self, value: V) -> Self
+        where
+            V: std::convert::TryInto<types::PausePolicyPolicyId>,
+        {
+            self.policy_id = value.try_into().map_err(|_| {
+                "conversion to `PausePolicyPolicyId` for policy_id failed".to_string()
+            });
+            self
+        }
+        pub fn x_idempotency_key<V>(mut self, value: V) -> Self
+        where
+            V: std::convert::TryInto<types::PausePolicyXIdempotencyKey>,
+        {
+            self.x_idempotency_key = value.try_into().map(Some).map_err(|_| {
+                "conversion to `PausePolicyXIdempotencyKey` for x_idempotency_key failed"
+                    .to_string()
+            });
+            self
+        }
+        pub fn body<V>(mut self, value: V) -> Self
+        where
+            V: std::convert::TryInto<types::PausePolicyRequest>,
+            <V as std::convert::TryInto<types::PausePolicyRequest>>::Error: std::fmt::Display,
+        {
+            self.body = value
+                .try_into()
+                .map(From::from)
+                .map_err(|s| format!("conversion to `PausePolicyRequest` for body failed: {}", s));
+            self
+        }
+        pub fn body_map<F>(mut self, f: F) -> Self
+        where
+            F: std::ops::FnOnce(
+                types::builder::PausePolicyRequest,
+            ) -> types::builder::PausePolicyRequest,
+        {
+            self.body = self.body.map(f);
+            self
+        }
+        ///Sends a `POST` request to `/v2/policy-engine/policies/{policyId}/pause`
+        pub async fn send(self) -> Result<ResponseValue<types::Policy>, Error<types::Error>> {
+            let Self {
+                client,
+                policy_id,
+                x_idempotency_key,
+                body,
+            } = self;
+            let policy_id = policy_id.map_err(Error::InvalidRequest)?;
+            let x_idempotency_key = x_idempotency_key.map_err(Error::InvalidRequest)?;
+            let body = body
+                .and_then(|v| types::PausePolicyRequest::try_from(v).map_err(|e| e.to_string()))
+                .map_err(Error::InvalidRequest)?;
+            let url = format!(
+                "{}/v2/policy-engine/policies/{}/pause",
+                client.baseurl,
+                encode_path(&policy_id.to_string()),
+            );
+            let mut header_map = ::reqwest::header::HeaderMap::with_capacity(2usize);
+            header_map.append(
+                ::reqwest::header::HeaderName::from_static("api-version"),
+                ::reqwest::header::HeaderValue::from_static(super::Client::api_version()),
+            );
+            if let Some(value) = x_idempotency_key {
+                header_map.append("X-Idempotency-Key", value.to_string().try_into()?);
+            }
+            #[allow(unused_mut)]
+            let mut request = client
+                .client
+                .post(url)
+                .header(
+                    ::reqwest::header::ACCEPT,
+                    ::reqwest::header::HeaderValue::from_static("application/json"),
+                )
+                .json(&body)
+                .headers(header_map)
+                .build()?;
+            let info = OperationInfo {
+                operation_id: "pause_policy",
+            };
+            client.pre(&mut request, &info).await?;
+            let result = client.exec(request, &info).await;
+            client.post(&result, &info).await?;
+            let response = result?;
+            match response.status().as_u16() {
+                200u16 => ResponseValue::from_response::<types::Error>(response).await,
+                400u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                404u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                422u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                500u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                502u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                503u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                _ => Err(Error::UnexpectedResponse(response)),
+            }
+        }
+    }
+    /**Builder for [`Client::resume_policy`]
+
+    [`Client::resume_policy`]: super::Client::resume_policy*/
+    #[derive(Debug, Clone)]
+    pub struct ResumePolicy<'a> {
+        client: &'a super::Client,
+        policy_id: Result<types::ResumePolicyPolicyId, String>,
+        x_idempotency_key: Result<Option<types::ResumePolicyXIdempotencyKey>, String>,
+    }
+    impl<'a> ResumePolicy<'a> {
+        pub fn new(client: &'a super::Client) -> Self {
+            Self {
+                client: client,
+                policy_id: Err("policy_id was not initialized".to_string()),
+                x_idempotency_key: Ok(None),
+            }
+        }
+        pub fn policy_id<V>(mut self, value: V) -> Self
+        where
+            V: std::convert::TryInto<types::ResumePolicyPolicyId>,
+        {
+            self.policy_id = value.try_into().map_err(|_| {
+                "conversion to `ResumePolicyPolicyId` for policy_id failed".to_string()
+            });
+            self
+        }
+        pub fn x_idempotency_key<V>(mut self, value: V) -> Self
+        where
+            V: std::convert::TryInto<types::ResumePolicyXIdempotencyKey>,
+        {
+            self.x_idempotency_key = value.try_into().map(Some).map_err(|_| {
+                "conversion to `ResumePolicyXIdempotencyKey` for x_idempotency_key failed"
+                    .to_string()
+            });
+            self
+        }
+        ///Sends a `POST` request to `/v2/policy-engine/policies/{policyId}/resume`
+        pub async fn send(self) -> Result<ResponseValue<types::Policy>, Error<types::Error>> {
+            let Self {
+                client,
+                policy_id,
+                x_idempotency_key,
+            } = self;
+            let policy_id = policy_id.map_err(Error::InvalidRequest)?;
+            let x_idempotency_key = x_idempotency_key.map_err(Error::InvalidRequest)?;
+            let url = format!(
+                "{}/v2/policy-engine/policies/{}/resume",
+                client.baseurl,
+                encode_path(&policy_id.to_string()),
+            );
+            let mut header_map = ::reqwest::header::HeaderMap::with_capacity(2usize);
+            header_map.append(
+                ::reqwest::header::HeaderName::from_static("api-version"),
+                ::reqwest::header::HeaderValue::from_static(super::Client::api_version()),
+            );
+            if let Some(value) = x_idempotency_key {
+                header_map.append("X-Idempotency-Key", value.to_string().try_into()?);
+            }
+            #[allow(unused_mut)]
+            let mut request = client
+                .client
+                .post(url)
+                .header(
+                    ::reqwest::header::ACCEPT,
+                    ::reqwest::header::HeaderValue::from_static("application/json"),
+                )
+                .headers(header_map)
+                .build()?;
+            let info = OperationInfo {
+                operation_id: "resume_policy",
+            };
+            client.pre(&mut request, &info).await?;
+            let result = client.exec(request, &info).await;
+            client.post(&result, &info).await?;
+            let response = result?;
+            match response.status().as_u16() {
+                200u16 => ResponseValue::from_response::<types::Error>(response).await,
+                400u16 => Err(Error::ErrorResponse(
+                    ResponseValue::from_response(response).await?,
+                )),
+                404u16 => Err(Error::ErrorResponse(
                     ResponseValue::from_response(response).await?,
                 )),
                 422u16 => Err(Error::ErrorResponse(

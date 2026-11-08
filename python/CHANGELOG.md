@@ -2,6 +2,21 @@
 
 <!-- towncrier release notes start -->
 
+## [1.52.0] - 2026-11-04
+
+### Features
+
+- Added `cdp.lend.list_vaults` and `cdp.lend.get_vault` to read the Lend vaults a project created, including their APY and TVL metrics. Also added the generated `LendApi.list_vaults` and `LendApi.get_vault` client methods.
+
+
+## [1.51.0] - 2026-10-22
+
+### Features
+
+- Added `pause_policy` and `resume_policy` to `PoliciesClient` to pause a policy indefinitely or until a time within the next 30 days, and added `status`, `paused_at`, and `resume_at` to `Policy`.
+- Added `redeem_vault_fees` to `EvmServerAccount` and `EvmSmartAccount` to redeem the vault fee shares held by a Lend vault's fee recipient account for the vault's underlying asset. Also added the generated `LendApi` client (`redeem_vault_fees_with_evm_account`, `redeem_vault_fees_with_evm_smart_account`).
+
+
 ## [1.50.0] - 2026-10-16
 
 ### Features

@@ -669,6 +669,11 @@ const (
 	InitiateOnrampVerificationRequestChannelSms   InitiateOnrampVerificationRequestChannel = "sms"
 )
 
+// Defines values for IosAttestationRegistrationResponsePlatform.
+const (
+	Ios IosAttestationRegistrationResponsePlatform = "ios"
+)
+
 // Defines values for KnownAbiType.
 const (
 	Erc1155 KnownAbiType = "erc1155"
@@ -681,6 +686,11 @@ const (
 	AssociatedTokenProgram KnownIdlType = "AssociatedTokenProgram"
 	SystemProgram          KnownIdlType = "SystemProgram"
 	TokenProgram           KnownIdlType = "TokenProgram"
+)
+
+// Defines values for LendNetwork.
+const (
+	LendNetworkBase LendNetwork = "base"
 )
 
 // Defines values for ListEvmTokenBalancesNetwork.
@@ -942,6 +952,12 @@ const (
 const (
 	PolicyScopeAccount PolicyScope = "account"
 	PolicyScopeProject PolicyScope = "project"
+)
+
+// Defines values for PolicyStatus.
+const (
+	PolicyStatusActive PolicyStatus = "active"
+	PolicyStatusPaused PolicyStatus = "paused"
 )
 
 // Defines values for PolicySimulationResultReason.
@@ -1481,6 +1497,13 @@ const (
 // Defines values for UsW9AttestationForm.
 const (
 	UsW9AttestationFormUsW9 UsW9AttestationForm = "us_w9"
+)
+
+// Defines values for VaultStatus.
+const (
+	VaultStatusActive  VaultStatus = "active"
+	VaultStatusFailed  VaultStatus = "failed"
+	VaultStatusPending VaultStatus = "pending"
 )
 
 // Defines values for WebhookEventResponseStatus.
@@ -2380,6 +2403,12 @@ type AmountDetail struct {
 	Total string `json:"total"`
 }
 
+// AndroidIntegrityPayload Android Play Integrity Standard API payload for verifying a signed challenge.
+type AndroidIntegrityPayload struct {
+	// IntegrityToken Play Integrity token (JWT) obtained from `StandardIntegrityManager.requestToken()`, proving this request originates from a genuine, unmodified installation of the partner app. The token must have been requested with `requestHash = base64url(SHA256(challenge))`, where `challenge` is the opaque token issued by the [Create Onramp Mobile Challenge](#operation/createOnrampMobileChallenge) endpoint.
+	IntegrityToken string `json:"integrityToken"`
+}
+
 // Approval An attempt to attach a funding source to a mandate and make it usable. A successful approval sets the mandate's `source` and moves the mandate to `approval_succeeded`; a failed one moves the mandate to `approval_failed` and can be retried by submitting a new approval. A mandate holds at most one active source, so at most one approval ever succeeds. The network transactions that grant the spending allowance are on `onchainTransactions`.
 type Approval struct {
 	// ApprovalId The unique identifier of the approval.
@@ -2442,6 +2471,15 @@ type ApprovalPayload struct {
 //     status becomes `approval_failed`; submit a new approval to retry (which
 //     moves it back to `approval_pending`).
 type ApprovalStatus string
+
+// ApyMetrics The trailing 30-day net APY of a lend resource, along with the timestamp of observation.
+type ApyMetrics struct {
+	// ApyBps The trailing 30-day net APY, in basis points, after all applicable performance fees. For example, `500` equates to 5%. Only present once sufficient history has been observed.
+	ApyBps *int `json:"apyBps,omitempty"`
+
+	// ApyUpdatedAt The time the APY metrics were last updated, in RFC 3339 format. Only present when `apyBps` is present.
+	ApyUpdatedAt *time.Time `json:"apyUpdatedAt,omitempty"`
+}
 
 // Asset The symbol of the asset (e.g., eth, usd, usdc, usdt).
 type Asset = string
@@ -2856,6 +2894,9 @@ type Capture struct {
 
 // CaptureId The ID of the capture, a UUID prefixed by `capture_`.
 type CaptureId = string
+
+// CatalogVaultId The globally unique ID of the catalog vault, which is a UUID prefixed with the string `cv_`.
+type CatalogVaultId = string
 
 // CloseBorrowPositionRequest A request to close an end user smart account's borrow position for the specified borrow product.
 // Closing fully repays the position's outstanding loan and withdraws all remaining collateral back to the smart account, broadcasting a single user operation to settle the position onchain. There is no partial close; use `adjustBorrowPositionWithEndUserAccount` to adjust a position without closing it.
@@ -3319,6 +3360,25 @@ type CreateMandateRequest struct {
 	// RevocationRedirect Optional merchant URLs used by the hosted mandate revocation flow. The revocation page redirects to `successUrl` when revocation succeeds, or `failureUrl` when it fails. Omit to keep the customer on the Coinbase-hosted experience.
 	RevocationRedirect *PaymentRedirect `json:"revocationRedirect,omitempty"`
 }
+
+// CreateOnrampMobileSessionRequest Request body for creating an onramp mobile session.
+type CreateOnrampMobileSessionRequest struct {
+	// Android Android Play Integrity Standard API payload for verifying a signed challenge.
+	Android *AndroidIntegrityPayload `json:"android,omitempty"`
+
+	// Challenge The challenge returned by the [Create Onramp Mobile Challenge](#operation/createOnrampMobileChallenge) endpoint. Must be passed back exactly as received — do not decode or modify.
+	Challenge OnrampMobileChallengeToken `json:"challenge"`
+
+	// Ios iOS App Attest assertion payload for verifying a signed challenge.
+	Ios   *IosAssertionPayload `json:"ios,omitempty"`
+	union json.RawMessage
+}
+
+// CreateOnrampMobileSessionRequest0 defines model for .
+type CreateOnrampMobileSessionRequest0 = interface{}
+
+// CreateOnrampMobileSessionRequest1 defines model for .
+type CreateOnrampMobileSessionRequest1 = interface{}
 
 // CreatePaymentSessionRequest A request to create a new payment session.
 type CreatePaymentSessionRequest struct {
@@ -4129,6 +4189,21 @@ type EndUserSolanaAccount struct {
 
 	// ExportedAt The date and time when the account's private key was first exported, in ISO 8601 format. This is set on the first export and preserved on subsequent exports; it is not updated on re-export.
 	ExportedAt *time.Time `json:"exportedAt"`
+}
+
+// EoaVaultRedeemFeesRequest defines model for EoaVaultRedeemFeesRequest.
+type EoaVaultRedeemFeesRequest struct {
+	// MaxSlippageBps The maximum share-price movement tolerated between calldata construction and onchain execution, in basis points. Defaults to 100 bps (1%) when omitted.
+	MaxSlippageBps *int `json:"maxSlippageBps,omitempty"`
+
+	// VaultId The globally unique ID of the vault, which is a UUID prefixed with the string `vault_`.
+	VaultId VaultId `json:"vaultId"`
+}
+
+// EoaVaultRedeemFeesResponse The result of a vault fee redemption from an EVM account after broadcast.
+type EoaVaultRedeemFeesResponse struct {
+	// TransactionHash The hash of the broadcast fee redemption transaction, as a 0x-prefixed hex string.
+	TransactionHash string `json:"transactionHash"`
 }
 
 // Erc20ApprovalPayload An ERC-20 approval transaction payload. The payer must send `data` as an EVM transaction via `eth_sendTransaction` and return the resulting transaction hash.
@@ -4972,6 +5047,66 @@ type InitiateOnrampVerificationRequest_Destination struct {
 	union json.RawMessage
 }
 
+// IosAssertionPayload iOS App Attest assertion payload for verifying a signed challenge.
+type IosAssertionPayload struct {
+	// Assertion Base64-encoded App Attest assertion generated by `DCAppAttestService.generateAssertion(keyId, clientDataHash: SHA256(challenge))`.
+	Assertion string `json:"assertion"`
+
+	// KeyId The key identifier of the iOS App Attest key previously registered via the attestation registration endpoint. This is the `keyId` returned by `DCAppAttestService.generateKey()`.
+	KeyId string `json:"keyId"`
+}
+
+// IosAttestationChallenge A cryptographic challenge for iOS App Attest attestation. Used only by iOS clients - Android uses a different flow with Play Integrity Standard API tokens.
+type IosAttestationChallenge struct {
+	// Challenge Base64-encoded cryptographically secure random challenge (32 bytes). This challenge is one-time use and must be included in the iOS attestation request.
+	Challenge string `json:"challenge"`
+
+	// ExpiresAt Timestamp when the challenge expires. Challenges are valid for 5 minutes.
+	ExpiresAt time.Time `json:"expiresAt"`
+}
+
+// IosAttestationPayload iOS App Attest payload for verification.
+type IosAttestationPayload struct {
+	// Attestation Base64-encoded attestation object from DCAppAttestService.attestKey().
+	Attestation string `json:"attestation"`
+
+	// BundleId iOS application bundle identifier (`CFBundleIdentifier`), as configured in the app's Xcode project / Info.plist, or shown for the App ID in Apple Developer. Must contain only alphanumeric characters (A–Z, a–z, 0–9), hyphens (-), and periods (.), typically in reverse-DNS form (e.g. `com.example.app`). Underscores are not permitted.
+	BundleId IosBundleId `json:"bundleId"`
+
+	// KeyId The key identifier generated by DCAppAttestService.
+	KeyId string `json:"keyId"`
+}
+
+// IosAttestationRegistrationRequest Request to register device public key for iOS App Attest attestation. This endpoint is iOS-only. Android devices use Play Integrity Standard API tokens sent directly in request headers instead.
+type IosAttestationRegistrationRequest struct {
+	// Challenge The challenge received from the challenge endpoint.
+	Challenge string `json:"challenge"`
+
+	// Ios iOS App Attest payload for verification.
+	Ios IosAttestationPayload `json:"ios"`
+}
+
+// IosAttestationRegistrationResponse Response confirming successful attestation verification and device key registration. The device public key is now stored for validating future assertion signatures.
+type IosAttestationRegistrationResponse struct {
+	// AppId The verified Apple application identifier in `teamID.bundleID` format. This is not a CDP project ID.
+	AppId string `json:"appId"`
+
+	// AttestedAt Timestamp when the attestation was performed.
+	AttestedAt time.Time `json:"attestedAt"`
+
+	// KeyId The key identifier that was registered. Include this value in subsequent [Create Onramp Mobile Session](#operation/createOnrampMobileSession) requests as `ios.keyId`.
+	KeyId string `json:"keyId"`
+
+	// Platform The mobile platform that was attested (iOS only).
+	Platform IosAttestationRegistrationResponsePlatform `json:"platform"`
+}
+
+// IosAttestationRegistrationResponsePlatform The mobile platform that was attested (iOS only).
+type IosAttestationRegistrationResponsePlatform string
+
+// IosBundleId iOS application bundle identifier (`CFBundleIdentifier`), as configured in the app's Xcode project / Info.plist, or shown for the App ID in Apple Developer. Must contain only alphanumeric characters (A–Z, a–z, 0–9), hyphens (-), and periods (.), typically in reverse-DNS form (e.g. `com.example.app`). Underscores are not permitted.
+type IosBundleId = string
+
 // IsIntermediary Indicates whether **Coinbase is acting as the intermediary Virtual Asset Service Provider (VASP)**, and your organization is acting as an originating VASP on behalf of your own end customer.
 //
 // **Background:**
@@ -5003,6 +5138,9 @@ type KnownAbiType string
 //   - [TokenProgram](https://docs.rs/spl-token/latest/spl_token/instruction/enum.TokenInstruction.html).
 //   - [AssociatedTokenProgram](https://docs.rs/spl-associated-token-account/latest/spl_associated_token_account/instruction/index.html).
 type KnownIdlType string
+
+// LendNetwork The network on which the lend resource (catalog vault or vault) is deployed.
+type LendNetwork string
 
 // ListEvmTokenBalancesNetwork The name of the supported EVM networks in human-readable format.
 type ListEvmTokenBalancesNetwork string
@@ -5326,6 +5464,9 @@ type NetUSDChangeObservation struct {
 // Network The blockchain network for the payment. Supported networks depend on the account type.
 type Network string
 
+// NonNegativeDecimal A non-negative decimal string without scientific notation, whitespace, leading zeros, or a trailing dot. Zero is allowed.
+type NonNegativeDecimal = string
+
 // OAuth2Authentication Information about an end user who authenticates using a third-party provider.
 type OAuth2Authentication struct {
 	// Email The email address of the end user contained within the user's ID token, if available from third-party OAuth2 provider's token exchange.
@@ -5635,6 +5776,22 @@ type OnrampLimitUpgradeRequest struct {
 // - `inactive`: The limit upgrade was rejected and cannot be resubmitted.
 type OnrampLimitUpgradeStatus string
 
+// OnrampMobileChallenge A server-issued challenge for platform attestation in an App2App onramp handoff.
+type OnrampMobileChallenge struct {
+	// Challenge An opaque server-issued token to be used with platform attestation (iOS App Attest or Android Play Integrity Standard). Treat it as an opaque string — do not attempt to parse its contents. Pass this value along with the attestation payload to the [Create Onramp Mobile Session](#operation/createOnrampMobileSession) endpoint to complete the App2App handoff.
+	//
+	// **iOS**: pass this value directly to `DCAppAttestService.generateAssertion(keyId, clientDataHash: SHA256(challenge))`.
+	//
+	// **Android**: compute `requestHash = base64url(SHA256(challenge))` and pass it to `StandardIntegrityManager.requestToken(requestHash)`.
+	Challenge OnrampMobileChallengeToken `json:"challenge"`
+
+	// ExpiresAt The time at which the challenge expires. Challenges are short-lived; submit the attestation to [Create Onramp Mobile Session](#operation/createOnrampMobileSession) before this time or request a new challenge.
+	ExpiresAt time.Time `json:"expiresAt"`
+}
+
+// OnrampMobileChallengeToken An opaque server-issued token used in the App2App onramp handoff. Treat it as an opaque string — do not attempt to parse or decode its contents.
+type OnrampMobileChallengeToken = string
+
 // OnrampOrder An Onramp order.
 type OnrampOrder struct {
 	// CreatedAt The date and time the order was created.
@@ -5873,6 +6030,12 @@ type OperationCustomerDisplay struct {
 //     Customer to have the `custodyCrypto`, `custodyFiat`, and `custodyStablecoin`
 //     capabilities enabled.
 type Owner = string
+
+// PausePolicyRequest defines model for PausePolicyRequest.
+type PausePolicyRequest struct {
+	// ResumeAt Optional future time at which the policy resumes automatically, at most 30 days from the request. If omitted, the policy stays paused until resumed.
+	ResumeAt *time.Time `json:"resumeAt,omitempty"`
+}
 
 // PaymasterContext The ERC-7677 `context` object forwarded to the paymaster service as part of the `paymasterService` capability. The fields in this object are defined by the paymaster service provider; CDP forwards them to the paymaster unchanged. This field is only valid when a paymaster is configured for the request. Providing `paymasterContext` without a paymaster configured results in an `invalid_request` error.
 type PaymasterContext map[string]interface{}
@@ -6174,11 +6337,20 @@ type Policy struct {
 	// Id The unique identifier for the policy.
 	Id string `json:"id"`
 
+	// PausedAt When the policy was paused. Present only when status is paused.
+	PausedAt *time.Time `json:"pausedAt,omitempty"`
+
+	// ResumeAt When a paused policy resumes automatically. Absent for an indefinite pause.
+	ResumeAt *time.Time `json:"resumeAt,omitempty"`
+
 	// Rules A list of rules that comprise the policy. Each policy is limited to 100 rules and a total serialized size of 8 MiB.
 	Rules PolicyRules `json:"rules"`
 
 	// Scope The scope of the policy. Only one project-level policy can exist at any time.
 	Scope PolicyScope `json:"scope"`
+
+	// Status The current evaluation status of the policy.
+	Status *PolicyStatus `json:"status,omitempty"`
 
 	// UpdatedAt The ISO 8601 timestamp at which the Policy was last updated.
 	UpdatedAt string `json:"updatedAt"`
@@ -6186,6 +6358,9 @@ type Policy struct {
 
 // PolicyScope The scope of the policy. Only one project-level policy can exist at any time.
 type PolicyScope string
+
+// PolicyStatus The current evaluation status of the policy.
+type PolicyStatus string
 
 // PolicyCriterion The unmet criterion, exactly as defined in the rule, discriminated by `type`.
 type PolicyCriterion struct {
@@ -7564,6 +7739,30 @@ type SiweAuthentication struct {
 // SiweAuthenticationType The type of authentication information.
 type SiweAuthenticationType string
 
+// SmartAccountVaultRedeemFeesRequest defines model for SmartAccountVaultRedeemFeesRequest.
+type SmartAccountVaultRedeemFeesRequest struct {
+	// MaxSlippageBps The maximum share-price movement tolerated between calldata construction and onchain execution, in basis points. Defaults to 100 bps (1%) when omitted.
+	MaxSlippageBps *int `json:"maxSlippageBps,omitempty"`
+
+	// PaymasterContext The ERC-7677 `context` object forwarded to the paymaster service as part of the `paymasterService` capability. The fields in this object are defined by the paymaster service provider; CDP forwards them to the paymaster unchanged. This field is only valid when a paymaster is configured for the request. Providing `paymasterContext` without a paymaster configured results in an `invalid_request` error.
+	PaymasterContext *PaymasterContext `json:"paymasterContext,omitempty"`
+
+	// PaymasterUrl Optional custom Paymaster URL to use for gas sponsorship. This allows you to use your own Paymaster service instead of CDP's Paymaster. Cannot be used together with `useCdpPaymaster`.
+	PaymasterUrl *Url `json:"paymasterUrl,omitempty"`
+
+	// UseCdpPaymaster Whether to use CDP Paymaster to sponsor gas fees. When true, the user operation gas will be paid by the Paymaster, allowing the account to redeem fees without holding native gas tokens. Cannot be used together with `paymasterUrl`.
+	UseCdpPaymaster *bool `json:"useCdpPaymaster,omitempty"`
+
+	// VaultId The globally unique ID of the vault, which is a UUID prefixed with the string `vault_`.
+	VaultId VaultId `json:"vaultId"`
+}
+
+// SmartAccountVaultRedeemFeesResponse The result of a vault fee redemption from an EVM Smart Account after broadcast.
+type SmartAccountVaultRedeemFeesResponse struct {
+	// UserOpHash The hash of the user operation executing the fee redemption, as a 0x-prefixed hex string. Poll `getUserOperation` for the operation's status.
+	UserOpHash string `json:"userOpHash"`
+}
+
 // SmsAuthentication Information about an end user who authenticates using a one-time password sent to their phone number via SMS.
 type SmsAuthentication struct {
 	// PhoneNumber Phone number in [E.164](https://en.wikipedia.org/wiki/E.164) format.
@@ -8655,6 +8854,69 @@ type UserOperationReceiptRevert struct {
 	// Message Human-readable revert reason if able to decode.
 	Message string `json:"message"`
 }
+
+// Vault A vault created on top of a catalog vault.
+type Vault struct {
+	// Address The 0x-prefixed onchain address of the vault. The address is deterministic and known at creation; the vault deploys at this address once the deployment user operation is included onchain.
+	Address string `json:"address"`
+
+	// CatalogVaultId The globally unique ID of the catalog vault, which is a UUID prefixed with the string `cv_`.
+	CatalogVaultId CatalogVaultId `json:"catalogVaultId"`
+
+	// CreatedAt The time the vault was created, in RFC 3339 format.
+	CreatedAt time.Time `json:"createdAt"`
+
+	// FeeRecipientAddress The 0x-prefixed address that receives the vault's performance fees.
+	FeeRecipientAddress string `json:"feeRecipientAddress"`
+
+	// Metrics The vault's current metrics. Only present once at least one metrics snapshot has been observed for the vault.
+	Metrics *VaultMetrics `json:"metrics,omitempty"`
+
+	// Network The network on which the lend resource (catalog vault or vault) is deployed.
+	Network LendNetwork `json:"network"`
+
+	// PerformanceFeeBps Your performance fee, in basis points. CDP charges an additional fee equal to currently 10% (1000 bps) of your fee.
+	PerformanceFeeBps int `json:"performanceFeeBps"`
+
+	// Status The lifecycle status of the vault. A vault is `pending` from creation until its deployment user operation succeeds onchain, then `active`. If the deployment user operation fails onchain, then the status is `failed`.
+	Status VaultStatus `json:"status"`
+
+	// UnderlyingAsset The symbol of the vault's underlying asset.
+	UnderlyingAsset Asset `json:"underlyingAsset"`
+
+	// VaultId The globally unique ID of the vault, which is a UUID prefixed with the string `vault_`.
+	VaultId VaultId `json:"vaultId"`
+}
+
+// VaultId The globally unique ID of the vault, which is a UUID prefixed with the string `vault_`.
+type VaultId = string
+
+// VaultMetrics defines model for VaultMetrics.
+type VaultMetrics struct {
+	// ApyBps The trailing 30-day net APY, in basis points, after all applicable performance fees. For example, `500` equates to 5%. Only present once sufficient history has been observed.
+	ApyBps *int `json:"apyBps,omitempty"`
+
+	// ApyUpdatedAt The time the APY metrics were last updated, in RFC 3339 format. Only present when `apyBps` is present.
+	ApyUpdatedAt *time.Time `json:"apyUpdatedAt,omitempty"`
+
+	// Tvl The total value locked in the vault, equivalent to the amount of funds deposited. It is expressed as a decimal string in standard unit denomination of the underlying asset. For example, `1000` equates to 1000 USDC. Only present once a TVL snapshot has been observed for the vault.
+	Tvl *NonNegativeDecimal `json:"tvl,omitempty"`
+
+	// TvlUpdatedAt The time the TVL metrics were last updated, in RFC 3339 format. Only present when `tvl` is present.
+	TvlUpdatedAt *time.Time `json:"tvlUpdatedAt,omitempty"`
+}
+
+// VaultRedeemFeesRequest Fields shared by vault fee redemption requests. Composed into `EoaVaultRedeemFeesRequest` and `SmartAccountVaultRedeemFeesRequest`, which add their account-specific fields on top.
+type VaultRedeemFeesRequest struct {
+	// MaxSlippageBps The maximum share-price movement tolerated between calldata construction and onchain execution, in basis points. Defaults to 100 bps (1%) when omitted.
+	MaxSlippageBps *int `json:"maxSlippageBps,omitempty"`
+
+	// VaultId The globally unique ID of the vault, which is a UUID prefixed with the string `vault_`.
+	VaultId VaultId `json:"vaultId"`
+}
+
+// VaultStatus The lifecycle status of the vault. A vault is `pending` from creation until its deployment user operation succeeds onchain, then `active`. If the deployment user operation fails onchain, then the status is `failed`.
+type VaultStatus string
 
 // Void A release of uncaptured authorized funds back to the payer. Voids release all remaining capturable funds in a single operation, including after partial refunds as long as a capturableAmount remains.
 type Void struct {
@@ -11304,6 +11566,19 @@ type ExportEvmAccountParams struct {
 	XIdempotencyKey *IdempotencyKey `json:"X-Idempotency-Key,omitempty"`
 }
 
+// RedeemVaultFeesWithEvmAccountParams defines parameters for RedeemVaultFeesWithEvmAccount.
+type RedeemVaultFeesWithEvmAccountParams struct {
+	// XWalletAuth A JWT signed using your Wallet Secret, encoded in base64. Refer to the
+	// [Generate Wallet Token](https://docs.cdp.coinbase.com/api-reference/v2/authentication#2-generate-wallet-token)
+	// section of our Authentication docs for more details on how to generate your Wallet Token.
+	XWalletAuth *XWalletAuth `json:"X-Wallet-Auth,omitempty"`
+
+	// XIdempotencyKey An optional string request header for making requests safely retryable.
+	// When included, duplicate requests with the same key will return identical responses.
+	// Refer to our [Idempotency docs](https://docs.cdp.coinbase.com/api-reference/v2/idempotency) for more information on using idempotency keys.
+	XIdempotencyKey *IdempotencyKey `json:"X-Idempotency-Key,omitempty"`
+}
+
 // SendEvmTransactionJSONBody defines parameters for SendEvmTransaction.
 type SendEvmTransactionJSONBody struct {
 	// Network The network to send the transaction to.
@@ -11453,6 +11728,19 @@ type UpdateEvmSmartAccountJSONBody struct {
 	Name *string `json:"name,omitempty"`
 }
 
+// RedeemVaultFeesWithEvmSmartAccountParams defines parameters for RedeemVaultFeesWithEvmSmartAccount.
+type RedeemVaultFeesWithEvmSmartAccountParams struct {
+	// XWalletAuth A JWT signed using your Wallet Secret, encoded in base64. Refer to the
+	// [Generate Wallet Token](https://docs.cdp.coinbase.com/api-reference/v2/authentication#2-generate-wallet-token)
+	// section of our Authentication docs for more details on how to generate your Wallet Token.
+	XWalletAuth *XWalletAuth `json:"X-Wallet-Auth,omitempty"`
+
+	// XIdempotencyKey An optional string request header for making requests safely retryable.
+	// When included, duplicate requests with the same key will return identical responses.
+	// Refer to our [Idempotency docs](https://docs.cdp.coinbase.com/api-reference/v2/idempotency) for more information on using idempotency keys.
+	XIdempotencyKey *IdempotencyKey `json:"X-Idempotency-Key,omitempty"`
+}
+
 // CreateSpendPermissionParams defines parameters for CreateSpendPermission.
 type CreateSpendPermissionParams struct {
 	// XWalletAuth A JWT signed using your Wallet Secret, encoded in base64. Refer to the
@@ -11596,6 +11884,15 @@ type ListEvmTokenBalancesParams struct {
 	PageToken *PageToken `form:"pageToken,omitempty" json:"pageToken,omitempty"`
 }
 
+// ListVaultsParams defines parameters for ListVaults.
+type ListVaultsParams struct {
+	// PageSize The number of vaults to return per page.
+	PageSize *int `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+
+	// PageToken The token for the next page of resources, if any.
+	PageToken *PageToken `form:"pageToken,omitempty" json:"pageToken,omitempty"`
+}
+
 // ListMandatesParams defines parameters for ListMandates.
 type ListMandatesParams struct {
 	// Address Filter mandates by the customer's wallet address.
@@ -11687,6 +11984,51 @@ type GetOnrampUserLimitsJSONBody struct {
 	// UserIdType The type of user identifier:
 	// - `phone_number`: A phone number in E.164 format associated with an onramp user.
 	UserIdType OnrampUserIdType `json:"userIdType"`
+}
+
+// CreateOnrampMobileChallengeJSONBody defines parameters for CreateOnrampMobileChallenge.
+type CreateOnrampMobileChallengeJSONBody struct {
+	// ClientIp The IP address of the end user requesting the onramp transaction.
+	ClientIp *string `json:"clientIp,omitempty"`
+
+	// Country The ISO 3166-1 two letter country code (e.g. US).
+	Country *string `json:"country,omitempty"`
+
+	// DestinationAddress The address the purchased crypto will be sent to.
+	DestinationAddress BlockchainAddress `json:"destinationAddress"`
+
+	// DestinationNetwork The name of the crypto network the purchased currency will be sent on.
+	//
+	// Use the [Onramp Buy Options API](https://docs.cdp.coinbase.com/api-reference/rest-api/onramp-offramp/get-buy-options) to discover the supported networks for your user's location.
+	DestinationNetwork string `json:"destinationNetwork"`
+
+	// PartnerUserRef A unique string that represents the user in your app. This can be used to link individual transactions together so you can retrieve the transaction history for your users. Prefix this string with "sandbox-" (e.g. "sandbox-user-1234") to perform a sandbox transaction which will allow you to test your integration without any real transfer of funds.
+	//
+	// This value can be used with the [Onramp User Transactions API](https://docs.cdp.coinbase.com/api-reference/rest-api/onramp-offramp/get-onramp-transactions-by-id) to retrieve all transactions created by the user.
+	PartnerUserRef *string `json:"partnerUserRef,omitempty"`
+
+	// PaymentAmount A string representing the amount of fiat the user wishes to pay in exchange for crypto. When using this parameter, the returned quote will be inclusive of fees i.e. the user will pay this exact amount of the payment currency.
+	PaymentAmount *string `json:"paymentAmount,omitempty"`
+
+	// PaymentCurrency The fiat currency to be converted to crypto.
+	PaymentCurrency *string `json:"paymentCurrency,omitempty"`
+
+	// PaymentMethod The type of payment method used to generate the onramp quote.
+	PaymentMethod *OnrampQuotePaymentMethodTypeId `json:"paymentMethod,omitempty"`
+
+	// PurchaseAmount A string representing the amount of crypto the user wishes to purchase. When using this parameter, the returned quote will be exclusive of fees i.e. the user will receive this exact amount of the purchase currency.
+	PurchaseAmount *string `json:"purchaseAmount,omitempty"`
+
+	// PurchaseCurrency The ticker (e.g. `BTC`, `USDC`, `SOL`) or the Coinbase UUID (e.g. `d85dce9b-5b73-5c3c-8978-522ce1d1c1b4`) of the crypto asset to be purchased.
+	//
+	// Use the [Onramp Buy Options API](https://docs.cdp.coinbase.com/api-reference/rest-api/onramp-offramp/get-buy-options) to discover the supported purchase currencies for your user's location.
+	PurchaseCurrency string `json:"purchaseCurrency"`
+
+	// RedirectUrl URI to redirect the user to after they complete or dismiss the transaction. Embedded in the returned onramp URL as a query parameter.
+	RedirectUrl Uri `json:"redirectUrl"`
+
+	// Subdivision The ISO 3166-2 two letter state code (e.g. NY). Only required for US.
+	Subdivision *string `json:"subdivision,omitempty"`
 }
 
 // CreateOnrampOrderJSONBody defines parameters for CreateOnrampOrder.
@@ -11996,6 +12338,22 @@ type UpdatePolicyJSONBody struct {
 
 // UpdatePolicyParams defines parameters for UpdatePolicy.
 type UpdatePolicyParams struct {
+	// XIdempotencyKey An optional string request header for making requests safely retryable.
+	// When included, duplicate requests with the same key will return identical responses.
+	// Refer to our [Idempotency docs](https://docs.cdp.coinbase.com/api-reference/v2/idempotency) for more information on using idempotency keys.
+	XIdempotencyKey *IdempotencyKey `json:"X-Idempotency-Key,omitempty"`
+}
+
+// PausePolicyParams defines parameters for PausePolicy.
+type PausePolicyParams struct {
+	// XIdempotencyKey An optional string request header for making requests safely retryable.
+	// When included, duplicate requests with the same key will return identical responses.
+	// Refer to our [Idempotency docs](https://docs.cdp.coinbase.com/api-reference/v2/idempotency) for more information on using idempotency keys.
+	XIdempotencyKey *IdempotencyKey `json:"X-Idempotency-Key,omitempty"`
+}
+
+// ResumePolicyParams defines parameters for ResumePolicy.
+type ResumePolicyParams struct {
 	// XIdempotencyKey An optional string request header for making requests safely retryable.
 	// When included, duplicate requests with the same key will return identical responses.
 	// Refer to our [Idempotency docs](https://docs.cdp.coinbase.com/api-reference/v2/idempotency) for more information on using idempotency keys.
@@ -12515,6 +12873,9 @@ type CreateEvmEip7702DelegationJSONRequestBody CreateEvmEip7702DelegationJSONBod
 // ExportEvmAccountJSONRequestBody defines body for ExportEvmAccount for application/json ContentType.
 type ExportEvmAccountJSONRequestBody ExportEvmAccountJSONBody
 
+// RedeemVaultFeesWithEvmAccountJSONRequestBody defines body for RedeemVaultFeesWithEvmAccount for application/json ContentType.
+type RedeemVaultFeesWithEvmAccountJSONRequestBody = EoaVaultRedeemFeesRequest
+
 // SendEvmTransactionJSONRequestBody defines body for SendEvmTransaction for application/json ContentType.
 type SendEvmTransactionJSONRequestBody SendEvmTransactionJSONBody
 
@@ -12538,6 +12899,9 @@ type CreateEvmSmartAccountJSONRequestBody CreateEvmSmartAccountJSONBody
 
 // UpdateEvmSmartAccountJSONRequestBody defines body for UpdateEvmSmartAccount for application/json ContentType.
 type UpdateEvmSmartAccountJSONRequestBody UpdateEvmSmartAccountJSONBody
+
+// RedeemVaultFeesWithEvmSmartAccountJSONRequestBody defines body for RedeemVaultFeesWithEvmSmartAccount for application/json ContentType.
+type RedeemVaultFeesWithEvmSmartAccountJSONRequestBody = SmartAccountVaultRedeemFeesRequest
 
 // CreateSpendPermissionJSONRequestBody defines body for CreateSpendPermission for application/json ContentType.
 type CreateSpendPermissionJSONRequestBody = CreateSpendPermissionRequest
@@ -12574,6 +12938,15 @@ type GetOnrampUserLimitsJSONRequestBody GetOnrampUserLimitsJSONBody
 
 // RequestLimitsUpgradeJSONRequestBody defines body for RequestLimitsUpgrade for application/json ContentType.
 type RequestLimitsUpgradeJSONRequestBody = OnrampLimitUpgradeRequest
+
+// RegisterOnrampIosAttestationJSONRequestBody defines body for RegisterOnrampIosAttestation for application/json ContentType.
+type RegisterOnrampIosAttestationJSONRequestBody = IosAttestationRegistrationRequest
+
+// CreateOnrampMobileSessionJSONRequestBody defines body for CreateOnrampMobileSession for application/json ContentType.
+type CreateOnrampMobileSessionJSONRequestBody = CreateOnrampMobileSessionRequest
+
+// CreateOnrampMobileChallengeJSONRequestBody defines body for CreateOnrampMobileChallenge for application/json ContentType.
+type CreateOnrampMobileChallengeJSONRequestBody CreateOnrampMobileChallengeJSONBody
 
 // CreateOnrampOrderJSONRequestBody defines body for CreateOnrampOrder for application/json ContentType.
 type CreateOnrampOrderJSONRequestBody CreateOnrampOrderJSONBody
@@ -12616,6 +12989,9 @@ type CreatePolicyJSONRequestBody CreatePolicyJSONBody
 
 // UpdatePolicyJSONRequestBody defines body for UpdatePolicy for application/json ContentType.
 type UpdatePolicyJSONRequestBody UpdatePolicyJSONBody
+
+// PausePolicyJSONRequestBody defines body for PausePolicy for application/json ContentType.
+type PausePolicyJSONRequestBody = PausePolicyRequest
 
 // SimulatePoliciesJSONRequestBody defines body for SimulatePolicies for application/json ContentType.
 type SimulatePoliciesJSONRequestBody = SimulatePoliciesRequest
@@ -13405,6 +13781,128 @@ func (t CreateEndUserEvmSwapCriteria_Item) MarshalJSON() ([]byte, error) {
 
 func (t *CreateEndUserEvmSwapCriteria_Item) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsCreateOnrampMobileSessionRequest0 returns the union data inside the CreateOnrampMobileSessionRequest as a CreateOnrampMobileSessionRequest0
+func (t CreateOnrampMobileSessionRequest) AsCreateOnrampMobileSessionRequest0() (CreateOnrampMobileSessionRequest0, error) {
+	var body CreateOnrampMobileSessionRequest0
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromCreateOnrampMobileSessionRequest0 overwrites any union data inside the CreateOnrampMobileSessionRequest as the provided CreateOnrampMobileSessionRequest0
+func (t *CreateOnrampMobileSessionRequest) FromCreateOnrampMobileSessionRequest0(v CreateOnrampMobileSessionRequest0) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeCreateOnrampMobileSessionRequest0 performs a merge with any union data inside the CreateOnrampMobileSessionRequest, using the provided CreateOnrampMobileSessionRequest0
+func (t *CreateOnrampMobileSessionRequest) MergeCreateOnrampMobileSessionRequest0(v CreateOnrampMobileSessionRequest0) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JsonMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsCreateOnrampMobileSessionRequest1 returns the union data inside the CreateOnrampMobileSessionRequest as a CreateOnrampMobileSessionRequest1
+func (t CreateOnrampMobileSessionRequest) AsCreateOnrampMobileSessionRequest1() (CreateOnrampMobileSessionRequest1, error) {
+	var body CreateOnrampMobileSessionRequest1
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromCreateOnrampMobileSessionRequest1 overwrites any union data inside the CreateOnrampMobileSessionRequest as the provided CreateOnrampMobileSessionRequest1
+func (t *CreateOnrampMobileSessionRequest) FromCreateOnrampMobileSessionRequest1(v CreateOnrampMobileSessionRequest1) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeCreateOnrampMobileSessionRequest1 performs a merge with any union data inside the CreateOnrampMobileSessionRequest, using the provided CreateOnrampMobileSessionRequest1
+func (t *CreateOnrampMobileSessionRequest) MergeCreateOnrampMobileSessionRequest1(v CreateOnrampMobileSessionRequest1) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JsonMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t CreateOnrampMobileSessionRequest) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	object := make(map[string]json.RawMessage)
+	if t.union != nil {
+		err = json.Unmarshal(b, &object)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if t.Android != nil {
+		object["android"], err = json.Marshal(t.Android)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'android': %w", err)
+		}
+	}
+
+	object["challenge"], err = json.Marshal(t.Challenge)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'challenge': %w", err)
+	}
+
+	if t.Ios != nil {
+		object["ios"], err = json.Marshal(t.Ios)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'ios': %w", err)
+		}
+	}
+	b, err = json.Marshal(object)
+	return b, err
+}
+
+func (t *CreateOnrampMobileSessionRequest) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	if err != nil {
+		return err
+	}
+	object := make(map[string]json.RawMessage)
+	err = json.Unmarshal(b, &object)
+	if err != nil {
+		return err
+	}
+
+	if raw, found := object["android"]; found {
+		err = json.Unmarshal(raw, &t.Android)
+		if err != nil {
+			return fmt.Errorf("error reading 'android': %w", err)
+		}
+	}
+
+	if raw, found := object["challenge"]; found {
+		err = json.Unmarshal(raw, &t.Challenge)
+		if err != nil {
+			return fmt.Errorf("error reading 'challenge': %w", err)
+		}
+	}
+
+	if raw, found := object["ios"]; found {
+		err = json.Unmarshal(raw, &t.Ios)
+		if err != nil {
+			return fmt.Errorf("error reading 'ios': %w", err)
+		}
+	}
+
 	return err
 }
 
@@ -20901,6 +21399,11 @@ type ClientInterface interface {
 
 	ExportEvmAccount(ctx context.Context, address string, params *ExportEvmAccountParams, body ExportEvmAccountJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// RedeemVaultFeesWithEvmAccountWithBody request with any body
+	RedeemVaultFeesWithEvmAccountWithBody(ctx context.Context, address string, params *RedeemVaultFeesWithEvmAccountParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	RedeemVaultFeesWithEvmAccount(ctx context.Context, address string, params *RedeemVaultFeesWithEvmAccountParams, body RedeemVaultFeesWithEvmAccountJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// SendEvmTransactionWithBody request with any body
 	SendEvmTransactionWithBody(ctx context.Context, address string, params *SendEvmTransactionParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -20953,6 +21456,11 @@ type ClientInterface interface {
 
 	UpdateEvmSmartAccount(ctx context.Context, address string, body UpdateEvmSmartAccountJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// RedeemVaultFeesWithEvmSmartAccountWithBody request with any body
+	RedeemVaultFeesWithEvmSmartAccountWithBody(ctx context.Context, address string, params *RedeemVaultFeesWithEvmSmartAccountParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	RedeemVaultFeesWithEvmSmartAccount(ctx context.Context, address string, params *RedeemVaultFeesWithEvmSmartAccountParams, body RedeemVaultFeesWithEvmSmartAccountJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// CreateSpendPermissionWithBody request with any body
 	CreateSpendPermissionWithBody(ctx context.Context, address string, params *CreateSpendPermissionParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -20994,6 +21502,12 @@ type ClientInterface interface {
 
 	// ListEvmTokenBalances request
 	ListEvmTokenBalances(ctx context.Context, network ListEvmTokenBalancesNetwork, address string, params *ListEvmTokenBalancesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListVaults request
+	ListVaults(ctx context.Context, params *ListVaultsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetVault request
+	GetVault(ctx context.Context, vaultId VaultId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListMandates request
 	ListMandates(ctx context.Context, params *ListMandatesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -21048,6 +21562,24 @@ type ClientInterface interface {
 	RequestLimitsUpgradeWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	RequestLimitsUpgrade(ctx context.Context, body RequestLimitsUpgradeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateOnrampIosAttestationChallenge request
+	CreateOnrampIosAttestationChallenge(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RegisterOnrampIosAttestationWithBody request with any body
+	RegisterOnrampIosAttestationWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	RegisterOnrampIosAttestation(ctx context.Context, body RegisterOnrampIosAttestationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateOnrampMobileSessionWithBody request with any body
+	CreateOnrampMobileSessionWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateOnrampMobileSession(ctx context.Context, body CreateOnrampMobileSessionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateOnrampMobileChallengeWithBody request with any body
+	CreateOnrampMobileChallengeWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateOnrampMobileChallenge(ctx context.Context, body CreateOnrampMobileChallengeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateOnrampOrderWithBody request with any body
 	CreateOnrampOrderWithBody(ctx context.Context, params *CreateOnrampOrderParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -21172,6 +21704,14 @@ type ClientInterface interface {
 	UpdatePolicyWithBody(ctx context.Context, policyId string, params *UpdatePolicyParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	UpdatePolicy(ctx context.Context, policyId string, params *UpdatePolicyParams, body UpdatePolicyJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PausePolicyWithBody request with any body
+	PausePolicyWithBody(ctx context.Context, policyId string, params *PausePolicyParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PausePolicy(ctx context.Context, policyId string, params *PausePolicyParams, body PausePolicyJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ResumePolicy request
+	ResumePolicy(ctx context.Context, policyId string, params *ResumePolicyParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// SimulatePoliciesWithBody request with any body
 	SimulatePoliciesWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -22642,6 +23182,30 @@ func (c *CDPClient) ExportEvmAccount(ctx context.Context, address string, params
 	return c.Client.Do(req)
 }
 
+func (c *CDPClient) RedeemVaultFeesWithEvmAccountWithBody(ctx context.Context, address string, params *RedeemVaultFeesWithEvmAccountParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRedeemVaultFeesWithEvmAccountRequestWithBody(c.Server, address, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *CDPClient) RedeemVaultFeesWithEvmAccount(ctx context.Context, address string, params *RedeemVaultFeesWithEvmAccountParams, body RedeemVaultFeesWithEvmAccountJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRedeemVaultFeesWithEvmAccountRequest(c.Server, address, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *CDPClient) SendEvmTransactionWithBody(ctx context.Context, address string, params *SendEvmTransactionParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewSendEvmTransactionRequestWithBody(c.Server, address, params, contentType, body)
 	if err != nil {
@@ -22882,6 +23446,30 @@ func (c *CDPClient) UpdateEvmSmartAccount(ctx context.Context, address string, b
 	return c.Client.Do(req)
 }
 
+func (c *CDPClient) RedeemVaultFeesWithEvmSmartAccountWithBody(ctx context.Context, address string, params *RedeemVaultFeesWithEvmSmartAccountParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRedeemVaultFeesWithEvmSmartAccountRequestWithBody(c.Server, address, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *CDPClient) RedeemVaultFeesWithEvmSmartAccount(ctx context.Context, address string, params *RedeemVaultFeesWithEvmSmartAccountParams, body RedeemVaultFeesWithEvmSmartAccountJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRedeemVaultFeesWithEvmSmartAccountRequest(c.Server, address, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *CDPClient) CreateSpendPermissionWithBody(ctx context.Context, address string, params *CreateSpendPermissionParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateSpendPermissionRequestWithBody(c.Server, address, params, contentType, body)
 	if err != nil {
@@ -23064,6 +23652,30 @@ func (c *CDPClient) GetEvmSwapPrice(ctx context.Context, params *GetEvmSwapPrice
 
 func (c *CDPClient) ListEvmTokenBalances(ctx context.Context, network ListEvmTokenBalancesNetwork, address string, params *ListEvmTokenBalancesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListEvmTokenBalancesRequest(c.Server, network, address, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *CDPClient) ListVaults(ctx context.Context, params *ListVaultsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListVaultsRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *CDPClient) GetVault(ctx context.Context, vaultId VaultId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetVaultRequest(c.Server, vaultId)
 	if err != nil {
 		return nil, err
 	}
@@ -23304,6 +23916,90 @@ func (c *CDPClient) RequestLimitsUpgradeWithBody(ctx context.Context, contentTyp
 
 func (c *CDPClient) RequestLimitsUpgrade(ctx context.Context, body RequestLimitsUpgradeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRequestLimitsUpgradeRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *CDPClient) CreateOnrampIosAttestationChallenge(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateOnrampIosAttestationChallengeRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *CDPClient) RegisterOnrampIosAttestationWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRegisterOnrampIosAttestationRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *CDPClient) RegisterOnrampIosAttestation(ctx context.Context, body RegisterOnrampIosAttestationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRegisterOnrampIosAttestationRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *CDPClient) CreateOnrampMobileSessionWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateOnrampMobileSessionRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *CDPClient) CreateOnrampMobileSession(ctx context.Context, body CreateOnrampMobileSessionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateOnrampMobileSessionRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *CDPClient) CreateOnrampMobileChallengeWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateOnrampMobileChallengeRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *CDPClient) CreateOnrampMobileChallenge(ctx context.Context, body CreateOnrampMobileChallengeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateOnrampMobileChallengeRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -23856,6 +24552,42 @@ func (c *CDPClient) UpdatePolicyWithBody(ctx context.Context, policyId string, p
 
 func (c *CDPClient) UpdatePolicy(ctx context.Context, policyId string, params *UpdatePolicyParams, body UpdatePolicyJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdatePolicyRequest(c.Server, policyId, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *CDPClient) PausePolicyWithBody(ctx context.Context, policyId string, params *PausePolicyParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPausePolicyRequestWithBody(c.Server, policyId, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *CDPClient) PausePolicy(ctx context.Context, policyId string, params *PausePolicyParams, body PausePolicyJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPausePolicyRequest(c.Server, policyId, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *CDPClient) ResumePolicy(ctx context.Context, policyId string, params *ResumePolicyParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewResumePolicyRequest(c.Server, policyId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -29833,6 +30565,79 @@ func NewExportEvmAccountRequestWithBody(server string, address string, params *E
 	return req, nil
 }
 
+// NewRedeemVaultFeesWithEvmAccountRequest calls the generic RedeemVaultFeesWithEvmAccount builder with application/json body
+func NewRedeemVaultFeesWithEvmAccountRequest(server string, address string, params *RedeemVaultFeesWithEvmAccountParams, body RedeemVaultFeesWithEvmAccountJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewRedeemVaultFeesWithEvmAccountRequestWithBody(server, address, params, "application/json", bodyReader)
+}
+
+// NewRedeemVaultFeesWithEvmAccountRequestWithBody generates requests for RedeemVaultFeesWithEvmAccount with any type of body
+func NewRedeemVaultFeesWithEvmAccountRequestWithBody(server string, address string, params *RedeemVaultFeesWithEvmAccountParams, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "address", runtime.ParamLocationPath, address)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v2/evm/accounts/%s/lend/redeem-fees", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	if params != nil {
+
+		if params.XWalletAuth != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithLocation("simple", false, "X-Wallet-Auth", runtime.ParamLocationHeader, *params.XWalletAuth)
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("X-Wallet-Auth", headerParam0)
+		}
+
+		if params.XIdempotencyKey != nil {
+			var headerParam1 string
+
+			headerParam1, err = runtime.StyleParamWithLocation("simple", false, "X-Idempotency-Key", runtime.ParamLocationHeader, *params.XIdempotencyKey)
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("X-Idempotency-Key", headerParam1)
+		}
+
+	}
+
+	return req, nil
+}
+
 // NewSendEvmTransactionRequest calls the generic SendEvmTransaction builder with application/json body
 func NewSendEvmTransactionRequest(server string, address string, params *SendEvmTransactionParams, body SendEvmTransactionJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
@@ -30503,6 +31308,79 @@ func NewUpdateEvmSmartAccountRequestWithBody(server string, address string, cont
 	}
 
 	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewRedeemVaultFeesWithEvmSmartAccountRequest calls the generic RedeemVaultFeesWithEvmSmartAccount builder with application/json body
+func NewRedeemVaultFeesWithEvmSmartAccountRequest(server string, address string, params *RedeemVaultFeesWithEvmSmartAccountParams, body RedeemVaultFeesWithEvmSmartAccountJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewRedeemVaultFeesWithEvmSmartAccountRequestWithBody(server, address, params, "application/json", bodyReader)
+}
+
+// NewRedeemVaultFeesWithEvmSmartAccountRequestWithBody generates requests for RedeemVaultFeesWithEvmSmartAccount with any type of body
+func NewRedeemVaultFeesWithEvmSmartAccountRequestWithBody(server string, address string, params *RedeemVaultFeesWithEvmSmartAccountParams, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "address", runtime.ParamLocationPath, address)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v2/evm/smart-accounts/%s/lend/redeem-fees", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	if params != nil {
+
+		if params.XWalletAuth != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithLocation("simple", false, "X-Wallet-Auth", runtime.ParamLocationHeader, *params.XWalletAuth)
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("X-Wallet-Auth", headerParam0)
+		}
+
+		if params.XIdempotencyKey != nil {
+			var headerParam1 string
+
+			headerParam1, err = runtime.StyleParamWithLocation("simple", false, "X-Idempotency-Key", runtime.ParamLocationHeader, *params.XIdempotencyKey)
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("X-Idempotency-Key", headerParam1)
+		}
+
+	}
 
 	return req, nil
 }
@@ -31205,6 +32083,105 @@ func NewListEvmTokenBalancesRequest(server string, network ListEvmTokenBalancesN
 		}
 
 		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewListVaultsRequest generates requests for ListVaults
+func NewListVaultsRequest(server string, params *ListVaultsParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v2/lend/vaults")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.PageSize != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "pageSize", runtime.ParamLocationQuery, *params.PageSize); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.PageToken != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "pageToken", runtime.ParamLocationQuery, *params.PageToken); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetVaultRequest generates requests for GetVault
+func NewGetVaultRequest(server string, vaultId VaultId) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "vaultId", runtime.ParamLocationPath, vaultId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v2/lend/vaults/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
 	}
 
 	req, err := http.NewRequest("GET", queryURL.String(), nil)
@@ -32008,6 +32985,153 @@ func NewRequestLimitsUpgradeRequestWithBody(server string, contentType string, b
 	}
 
 	operationPath := fmt.Sprintf("/v2/onramp/limits/upgrade")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewCreateOnrampIosAttestationChallengeRequest generates requests for CreateOnrampIosAttestationChallenge
+func NewCreateOnrampIosAttestationChallengeRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v2/onramp/mobile/attestation/challenges")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRegisterOnrampIosAttestationRequest calls the generic RegisterOnrampIosAttestation builder with application/json body
+func NewRegisterOnrampIosAttestationRequest(server string, body RegisterOnrampIosAttestationJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewRegisterOnrampIosAttestationRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewRegisterOnrampIosAttestationRequestWithBody generates requests for RegisterOnrampIosAttestation with any type of body
+func NewRegisterOnrampIosAttestationRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v2/onramp/mobile/attestation/registrations")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewCreateOnrampMobileSessionRequest calls the generic CreateOnrampMobileSession builder with application/json body
+func NewCreateOnrampMobileSessionRequest(server string, body CreateOnrampMobileSessionJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateOnrampMobileSessionRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreateOnrampMobileSessionRequestWithBody generates requests for CreateOnrampMobileSession with any type of body
+func NewCreateOnrampMobileSessionRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v2/onramp/mobile/sessions")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewCreateOnrampMobileChallengeRequest calls the generic CreateOnrampMobileChallenge builder with application/json body
+func NewCreateOnrampMobileChallengeRequest(server string, body CreateOnrampMobileChallengeJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateOnrampMobileChallengeRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreateOnrampMobileChallengeRequestWithBody generates requests for CreateOnrampMobileChallenge with any type of body
+func NewCreateOnrampMobileChallengeRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v2/onramp/mobile/sessions/challenges")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -33864,6 +34988,117 @@ func NewUpdatePolicyRequestWithBody(server string, policyId string, params *Upda
 	}
 
 	req.Header.Add("Content-Type", contentType)
+
+	if params != nil {
+
+		if params.XIdempotencyKey != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithLocation("simple", false, "X-Idempotency-Key", runtime.ParamLocationHeader, *params.XIdempotencyKey)
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("X-Idempotency-Key", headerParam0)
+		}
+
+	}
+
+	return req, nil
+}
+
+// NewPausePolicyRequest calls the generic PausePolicy builder with application/json body
+func NewPausePolicyRequest(server string, policyId string, params *PausePolicyParams, body PausePolicyJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPausePolicyRequestWithBody(server, policyId, params, "application/json", bodyReader)
+}
+
+// NewPausePolicyRequestWithBody generates requests for PausePolicy with any type of body
+func NewPausePolicyRequestWithBody(server string, policyId string, params *PausePolicyParams, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "policyId", runtime.ParamLocationPath, policyId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v2/policy-engine/policies/%s/pause", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	if params != nil {
+
+		if params.XIdempotencyKey != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithLocation("simple", false, "X-Idempotency-Key", runtime.ParamLocationHeader, *params.XIdempotencyKey)
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("X-Idempotency-Key", headerParam0)
+		}
+
+	}
+
+	return req, nil
+}
+
+// NewResumePolicyRequest generates requests for ResumePolicy
+func NewResumePolicyRequest(server string, policyId string, params *ResumePolicyParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "policyId", runtime.ParamLocationPath, policyId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v2/policy-engine/policies/%s/resume", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
 
 	if params != nil {
 
@@ -36241,6 +37476,11 @@ type ClientWithResponsesInterface interface {
 
 	ExportEvmAccountWithResponse(ctx context.Context, address string, params *ExportEvmAccountParams, body ExportEvmAccountJSONRequestBody, reqEditors ...RequestEditorFn) (*ExportEvmAccountResponse, error)
 
+	// RedeemVaultFeesWithEvmAccountWithBodyWithResponse request with any body
+	RedeemVaultFeesWithEvmAccountWithBodyWithResponse(ctx context.Context, address string, params *RedeemVaultFeesWithEvmAccountParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RedeemVaultFeesWithEvmAccountResponse, error)
+
+	RedeemVaultFeesWithEvmAccountWithResponse(ctx context.Context, address string, params *RedeemVaultFeesWithEvmAccountParams, body RedeemVaultFeesWithEvmAccountJSONRequestBody, reqEditors ...RequestEditorFn) (*RedeemVaultFeesWithEvmAccountResponse, error)
+
 	// SendEvmTransactionWithBodyWithResponse request with any body
 	SendEvmTransactionWithBodyWithResponse(ctx context.Context, address string, params *SendEvmTransactionParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SendEvmTransactionResponse, error)
 
@@ -36293,6 +37533,11 @@ type ClientWithResponsesInterface interface {
 
 	UpdateEvmSmartAccountWithResponse(ctx context.Context, address string, body UpdateEvmSmartAccountJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateEvmSmartAccountResponse, error)
 
+	// RedeemVaultFeesWithEvmSmartAccountWithBodyWithResponse request with any body
+	RedeemVaultFeesWithEvmSmartAccountWithBodyWithResponse(ctx context.Context, address string, params *RedeemVaultFeesWithEvmSmartAccountParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RedeemVaultFeesWithEvmSmartAccountResponse, error)
+
+	RedeemVaultFeesWithEvmSmartAccountWithResponse(ctx context.Context, address string, params *RedeemVaultFeesWithEvmSmartAccountParams, body RedeemVaultFeesWithEvmSmartAccountJSONRequestBody, reqEditors ...RequestEditorFn) (*RedeemVaultFeesWithEvmSmartAccountResponse, error)
+
 	// CreateSpendPermissionWithBodyWithResponse request with any body
 	CreateSpendPermissionWithBodyWithResponse(ctx context.Context, address string, params *CreateSpendPermissionParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSpendPermissionResponse, error)
 
@@ -36334,6 +37579,12 @@ type ClientWithResponsesInterface interface {
 
 	// ListEvmTokenBalancesWithResponse request
 	ListEvmTokenBalancesWithResponse(ctx context.Context, network ListEvmTokenBalancesNetwork, address string, params *ListEvmTokenBalancesParams, reqEditors ...RequestEditorFn) (*ListEvmTokenBalancesResponse, error)
+
+	// ListVaultsWithResponse request
+	ListVaultsWithResponse(ctx context.Context, params *ListVaultsParams, reqEditors ...RequestEditorFn) (*ListVaultsResponse, error)
+
+	// GetVaultWithResponse request
+	GetVaultWithResponse(ctx context.Context, vaultId VaultId, reqEditors ...RequestEditorFn) (*GetVaultResponse, error)
 
 	// ListMandatesWithResponse request
 	ListMandatesWithResponse(ctx context.Context, params *ListMandatesParams, reqEditors ...RequestEditorFn) (*ListMandatesResponse, error)
@@ -36388,6 +37639,24 @@ type ClientWithResponsesInterface interface {
 	RequestLimitsUpgradeWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RequestLimitsUpgradeResponse, error)
 
 	RequestLimitsUpgradeWithResponse(ctx context.Context, body RequestLimitsUpgradeJSONRequestBody, reqEditors ...RequestEditorFn) (*RequestLimitsUpgradeResponse, error)
+
+	// CreateOnrampIosAttestationChallengeWithResponse request
+	CreateOnrampIosAttestationChallengeWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*CreateOnrampIosAttestationChallengeResponse, error)
+
+	// RegisterOnrampIosAttestationWithBodyWithResponse request with any body
+	RegisterOnrampIosAttestationWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RegisterOnrampIosAttestationResponse, error)
+
+	RegisterOnrampIosAttestationWithResponse(ctx context.Context, body RegisterOnrampIosAttestationJSONRequestBody, reqEditors ...RequestEditorFn) (*RegisterOnrampIosAttestationResponse, error)
+
+	// CreateOnrampMobileSessionWithBodyWithResponse request with any body
+	CreateOnrampMobileSessionWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateOnrampMobileSessionResponse, error)
+
+	CreateOnrampMobileSessionWithResponse(ctx context.Context, body CreateOnrampMobileSessionJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateOnrampMobileSessionResponse, error)
+
+	// CreateOnrampMobileChallengeWithBodyWithResponse request with any body
+	CreateOnrampMobileChallengeWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateOnrampMobileChallengeResponse, error)
+
+	CreateOnrampMobileChallengeWithResponse(ctx context.Context, body CreateOnrampMobileChallengeJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateOnrampMobileChallengeResponse, error)
 
 	// CreateOnrampOrderWithBodyWithResponse request with any body
 	CreateOnrampOrderWithBodyWithResponse(ctx context.Context, params *CreateOnrampOrderParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateOnrampOrderResponse, error)
@@ -36512,6 +37781,14 @@ type ClientWithResponsesInterface interface {
 	UpdatePolicyWithBodyWithResponse(ctx context.Context, policyId string, params *UpdatePolicyParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdatePolicyResponse, error)
 
 	UpdatePolicyWithResponse(ctx context.Context, policyId string, params *UpdatePolicyParams, body UpdatePolicyJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdatePolicyResponse, error)
+
+	// PausePolicyWithBodyWithResponse request with any body
+	PausePolicyWithBodyWithResponse(ctx context.Context, policyId string, params *PausePolicyParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PausePolicyResponse, error)
+
+	PausePolicyWithResponse(ctx context.Context, policyId string, params *PausePolicyParams, body PausePolicyJSONRequestBody, reqEditors ...RequestEditorFn) (*PausePolicyResponse, error)
+
+	// ResumePolicyWithResponse request
+	ResumePolicyWithResponse(ctx context.Context, policyId string, params *ResumePolicyParams, reqEditors ...RequestEditorFn) (*ResumePolicyResponse, error)
 
 	// SimulatePoliciesWithBodyWithResponse request with any body
 	SimulatePoliciesWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SimulatePoliciesResponse, error)
@@ -38789,6 +40066,38 @@ func (r ExportEvmAccountResponse) StatusCode() int {
 	return 0
 }
 
+type RedeemVaultFeesWithEvmAccountResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *EoaVaultRedeemFeesResponse
+	JSON400      *Error
+	JSON401      *UnauthorizedError
+	JSON402      *PaymentMethodRequiredError
+	JSON403      *ForbiddenError
+	JSON404      *Error
+	JSON409      *Error
+	JSON422      *IdempotencyError
+	JSON500      *InternalServerError
+	JSON502      *BadGatewayError
+	JSON503      *ServiceUnavailableError
+}
+
+// Status returns HTTPResponse.Status
+func (r RedeemVaultFeesWithEvmAccountResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RedeemVaultFeesWithEvmAccountResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type SendEvmTransactionResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -39159,6 +40468,38 @@ func (r UpdateEvmSmartAccountResponse) StatusCode() int {
 	return 0
 }
 
+type RedeemVaultFeesWithEvmSmartAccountResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *SmartAccountVaultRedeemFeesResponse
+	JSON400      *Error
+	JSON401      *UnauthorizedError
+	JSON402      *PaymentMethodRequiredError
+	JSON403      *ForbiddenError
+	JSON404      *Error
+	JSON409      *Error
+	JSON422      *IdempotencyError
+	JSON500      *InternalServerError
+	JSON502      *BadGatewayError
+	JSON503      *ServiceUnavailableError
+}
+
+// Status returns HTTPResponse.Status
+func (r RedeemVaultFeesWithEvmSmartAccountResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RedeemVaultFeesWithEvmSmartAccountResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type CreateSpendPermissionResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -39445,6 +40786,64 @@ func (r ListEvmTokenBalancesResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r ListEvmTokenBalancesResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ListVaultsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *struct {
+		// NextPageToken The token for the next page of items, if any.
+		NextPageToken *string `json:"nextPageToken,omitempty"`
+
+		// Vaults The list of vaults created by the project.
+		Vaults []Vault `json:"vaults"`
+	}
+	JSON400 *Error
+	JSON401 *UnauthorizedError
+	JSON500 *InternalServerError
+	JSON503 *ServiceUnavailableError
+}
+
+// Status returns HTTPResponse.Status
+func (r ListVaultsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListVaultsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetVaultResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Vault
+	JSON401      *UnauthorizedError
+	JSON404      *Error
+	JSON500      *InternalServerError
+	JSON503      *ServiceUnavailableError
+}
+
+// Status returns HTTPResponse.Status
+func (r GetVaultResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetVaultResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -39845,6 +41244,116 @@ func (r RequestLimitsUpgradeResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r RequestLimitsUpgradeResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateOnrampIosAttestationChallengeResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *IosAttestationChallenge
+	JSON401      *UnauthorizedError
+	JSON403      *ForbiddenError
+	JSON429      *RateLimitExceeded
+	JSON500      *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateOnrampIosAttestationChallengeResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateOnrampIosAttestationChallengeResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RegisterOnrampIosAttestationResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *IosAttestationRegistrationResponse
+	JSON400      *Error
+	JSON429      *RateLimitExceeded
+	JSON500      *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RegisterOnrampIosAttestationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RegisterOnrampIosAttestationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateOnrampMobileSessionResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *struct {
+		// Session An onramp session containing a ready-to-use onramp URL.
+		Session OnrampSession `json:"session"`
+	}
+	JSON400 *Error
+	JSON403 *Error
+	JSON422 *Error
+	JSON429 *RateLimitExceeded
+	JSON500 *InternalServerError
+	JSON503 *ServiceUnavailableError
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateOnrampMobileSessionResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateOnrampMobileSessionResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateOnrampMobileChallengeResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *OnrampMobileChallenge
+	JSON400      *Error
+	JSON401      *UnauthorizedError
+	JSON403      *Error
+	JSON429      *RateLimitExceeded
+	JSON500      *InternalServerError
+	JSON503      *ServiceUnavailableError
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateOnrampMobileChallengeResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateOnrampMobileChallengeResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -40776,6 +42285,62 @@ func (r UpdatePolicyResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r UpdatePolicyResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PausePolicyResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Policy
+	JSON400      *Error
+	JSON404      *Error
+	JSON422      *IdempotencyError
+	JSON500      *InternalServerError
+	JSON502      *BadGatewayError
+	JSON503      *ServiceUnavailableError
+}
+
+// Status returns HTTPResponse.Status
+func (r PausePolicyResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PausePolicyResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ResumePolicyResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Policy
+	JSON400      *Error
+	JSON404      *Error
+	JSON422      *IdempotencyError
+	JSON500      *InternalServerError
+	JSON502      *BadGatewayError
+	JSON503      *ServiceUnavailableError
+}
+
+// Status returns HTTPResponse.Status
+func (r ResumePolicyResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ResumePolicyResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -42609,6 +44174,23 @@ func (c *ClientWithResponses) ExportEvmAccountWithResponse(ctx context.Context, 
 	return ParseExportEvmAccountResponse(rsp)
 }
 
+// RedeemVaultFeesWithEvmAccountWithBodyWithResponse request with arbitrary body returning *RedeemVaultFeesWithEvmAccountResponse
+func (c *ClientWithResponses) RedeemVaultFeesWithEvmAccountWithBodyWithResponse(ctx context.Context, address string, params *RedeemVaultFeesWithEvmAccountParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RedeemVaultFeesWithEvmAccountResponse, error) {
+	rsp, err := c.RedeemVaultFeesWithEvmAccountWithBody(ctx, address, params, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRedeemVaultFeesWithEvmAccountResponse(rsp)
+}
+
+func (c *ClientWithResponses) RedeemVaultFeesWithEvmAccountWithResponse(ctx context.Context, address string, params *RedeemVaultFeesWithEvmAccountParams, body RedeemVaultFeesWithEvmAccountJSONRequestBody, reqEditors ...RequestEditorFn) (*RedeemVaultFeesWithEvmAccountResponse, error) {
+	rsp, err := c.RedeemVaultFeesWithEvmAccount(ctx, address, params, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRedeemVaultFeesWithEvmAccountResponse(rsp)
+}
+
 // SendEvmTransactionWithBodyWithResponse request with arbitrary body returning *SendEvmTransactionResponse
 func (c *ClientWithResponses) SendEvmTransactionWithBodyWithResponse(ctx context.Context, address string, params *SendEvmTransactionParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SendEvmTransactionResponse, error) {
 	rsp, err := c.SendEvmTransactionWithBody(ctx, address, params, contentType, body, reqEditors...)
@@ -42781,6 +44363,23 @@ func (c *ClientWithResponses) UpdateEvmSmartAccountWithResponse(ctx context.Cont
 	return ParseUpdateEvmSmartAccountResponse(rsp)
 }
 
+// RedeemVaultFeesWithEvmSmartAccountWithBodyWithResponse request with arbitrary body returning *RedeemVaultFeesWithEvmSmartAccountResponse
+func (c *ClientWithResponses) RedeemVaultFeesWithEvmSmartAccountWithBodyWithResponse(ctx context.Context, address string, params *RedeemVaultFeesWithEvmSmartAccountParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RedeemVaultFeesWithEvmSmartAccountResponse, error) {
+	rsp, err := c.RedeemVaultFeesWithEvmSmartAccountWithBody(ctx, address, params, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRedeemVaultFeesWithEvmSmartAccountResponse(rsp)
+}
+
+func (c *ClientWithResponses) RedeemVaultFeesWithEvmSmartAccountWithResponse(ctx context.Context, address string, params *RedeemVaultFeesWithEvmSmartAccountParams, body RedeemVaultFeesWithEvmSmartAccountJSONRequestBody, reqEditors ...RequestEditorFn) (*RedeemVaultFeesWithEvmSmartAccountResponse, error) {
+	rsp, err := c.RedeemVaultFeesWithEvmSmartAccount(ctx, address, params, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRedeemVaultFeesWithEvmSmartAccountResponse(rsp)
+}
+
 // CreateSpendPermissionWithBodyWithResponse request with arbitrary body returning *CreateSpendPermissionResponse
 func (c *ClientWithResponses) CreateSpendPermissionWithBodyWithResponse(ctx context.Context, address string, params *CreateSpendPermissionParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSpendPermissionResponse, error) {
 	rsp, err := c.CreateSpendPermissionWithBody(ctx, address, params, contentType, body, reqEditors...)
@@ -42917,6 +44516,24 @@ func (c *ClientWithResponses) ListEvmTokenBalancesWithResponse(ctx context.Conte
 		return nil, err
 	}
 	return ParseListEvmTokenBalancesResponse(rsp)
+}
+
+// ListVaultsWithResponse request returning *ListVaultsResponse
+func (c *ClientWithResponses) ListVaultsWithResponse(ctx context.Context, params *ListVaultsParams, reqEditors ...RequestEditorFn) (*ListVaultsResponse, error) {
+	rsp, err := c.ListVaults(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListVaultsResponse(rsp)
+}
+
+// GetVaultWithResponse request returning *GetVaultResponse
+func (c *ClientWithResponses) GetVaultWithResponse(ctx context.Context, vaultId VaultId, reqEditors ...RequestEditorFn) (*GetVaultResponse, error) {
+	rsp, err := c.GetVault(ctx, vaultId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetVaultResponse(rsp)
 }
 
 // ListMandatesWithResponse request returning *ListMandatesResponse
@@ -43091,6 +44708,66 @@ func (c *ClientWithResponses) RequestLimitsUpgradeWithResponse(ctx context.Conte
 		return nil, err
 	}
 	return ParseRequestLimitsUpgradeResponse(rsp)
+}
+
+// CreateOnrampIosAttestationChallengeWithResponse request returning *CreateOnrampIosAttestationChallengeResponse
+func (c *ClientWithResponses) CreateOnrampIosAttestationChallengeWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*CreateOnrampIosAttestationChallengeResponse, error) {
+	rsp, err := c.CreateOnrampIosAttestationChallenge(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateOnrampIosAttestationChallengeResponse(rsp)
+}
+
+// RegisterOnrampIosAttestationWithBodyWithResponse request with arbitrary body returning *RegisterOnrampIosAttestationResponse
+func (c *ClientWithResponses) RegisterOnrampIosAttestationWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RegisterOnrampIosAttestationResponse, error) {
+	rsp, err := c.RegisterOnrampIosAttestationWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRegisterOnrampIosAttestationResponse(rsp)
+}
+
+func (c *ClientWithResponses) RegisterOnrampIosAttestationWithResponse(ctx context.Context, body RegisterOnrampIosAttestationJSONRequestBody, reqEditors ...RequestEditorFn) (*RegisterOnrampIosAttestationResponse, error) {
+	rsp, err := c.RegisterOnrampIosAttestation(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRegisterOnrampIosAttestationResponse(rsp)
+}
+
+// CreateOnrampMobileSessionWithBodyWithResponse request with arbitrary body returning *CreateOnrampMobileSessionResponse
+func (c *ClientWithResponses) CreateOnrampMobileSessionWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateOnrampMobileSessionResponse, error) {
+	rsp, err := c.CreateOnrampMobileSessionWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateOnrampMobileSessionResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateOnrampMobileSessionWithResponse(ctx context.Context, body CreateOnrampMobileSessionJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateOnrampMobileSessionResponse, error) {
+	rsp, err := c.CreateOnrampMobileSession(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateOnrampMobileSessionResponse(rsp)
+}
+
+// CreateOnrampMobileChallengeWithBodyWithResponse request with arbitrary body returning *CreateOnrampMobileChallengeResponse
+func (c *ClientWithResponses) CreateOnrampMobileChallengeWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateOnrampMobileChallengeResponse, error) {
+	rsp, err := c.CreateOnrampMobileChallengeWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateOnrampMobileChallengeResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateOnrampMobileChallengeWithResponse(ctx context.Context, body CreateOnrampMobileChallengeJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateOnrampMobileChallengeResponse, error) {
+	rsp, err := c.CreateOnrampMobileChallenge(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateOnrampMobileChallengeResponse(rsp)
 }
 
 // CreateOnrampOrderWithBodyWithResponse request with arbitrary body returning *CreateOnrampOrderResponse
@@ -43491,6 +45168,32 @@ func (c *ClientWithResponses) UpdatePolicyWithResponse(ctx context.Context, poli
 		return nil, err
 	}
 	return ParseUpdatePolicyResponse(rsp)
+}
+
+// PausePolicyWithBodyWithResponse request with arbitrary body returning *PausePolicyResponse
+func (c *ClientWithResponses) PausePolicyWithBodyWithResponse(ctx context.Context, policyId string, params *PausePolicyParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PausePolicyResponse, error) {
+	rsp, err := c.PausePolicyWithBody(ctx, policyId, params, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePausePolicyResponse(rsp)
+}
+
+func (c *ClientWithResponses) PausePolicyWithResponse(ctx context.Context, policyId string, params *PausePolicyParams, body PausePolicyJSONRequestBody, reqEditors ...RequestEditorFn) (*PausePolicyResponse, error) {
+	rsp, err := c.PausePolicy(ctx, policyId, params, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePausePolicyResponse(rsp)
+}
+
+// ResumePolicyWithResponse request returning *ResumePolicyResponse
+func (c *ClientWithResponses) ResumePolicyWithResponse(ctx context.Context, policyId string, params *ResumePolicyParams, reqEditors ...RequestEditorFn) (*ResumePolicyResponse, error) {
+	rsp, err := c.ResumePolicy(ctx, policyId, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseResumePolicyResponse(rsp)
 }
 
 // SimulatePoliciesWithBodyWithResponse request with arbitrary body returning *SimulatePoliciesResponse
@@ -48984,6 +50687,102 @@ func ParseExportEvmAccountResponse(rsp *http.Response) (*ExportEvmAccountRespons
 	return response, nil
 }
 
+// ParseRedeemVaultFeesWithEvmAccountResponse parses an HTTP response from a RedeemVaultFeesWithEvmAccountWithResponse call
+func ParseRedeemVaultFeesWithEvmAccountResponse(rsp *http.Response) (*RedeemVaultFeesWithEvmAccountResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RedeemVaultFeesWithEvmAccountResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest EoaVaultRedeemFeesResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest UnauthorizedError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 402:
+		var dest PaymentMethodRequiredError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON402 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest ForbiddenError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest IdempotencyError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 502:
+		var dest BadGatewayError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON502 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest ServiceUnavailableError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseSendEvmTransactionResponse parses an HTTP response from a SendEvmTransactionWithResponse call
 func ParseSendEvmTransactionResponse(rsp *http.Response) (*SendEvmTransactionResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -49888,6 +51687,102 @@ func ParseUpdateEvmSmartAccountResponse(rsp *http.Response) (*UpdateEvmSmartAcco
 	return response, nil
 }
 
+// ParseRedeemVaultFeesWithEvmSmartAccountResponse parses an HTTP response from a RedeemVaultFeesWithEvmSmartAccountWithResponse call
+func ParseRedeemVaultFeesWithEvmSmartAccountResponse(rsp *http.Response) (*RedeemVaultFeesWithEvmSmartAccountResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RedeemVaultFeesWithEvmSmartAccountResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest SmartAccountVaultRedeemFeesResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest UnauthorizedError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 402:
+		var dest PaymentMethodRequiredError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON402 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest ForbiddenError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest IdempotencyError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 502:
+		var dest BadGatewayError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON502 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest ServiceUnavailableError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseCreateSpendPermissionResponse parses an HTTP response from a CreateSpendPermissionWithResponse call
 func ParseCreateSpendPermissionResponse(rsp *http.Response) (*CreateSpendPermissionResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -50567,6 +52462,120 @@ func ParseListEvmTokenBalancesResponse(rsp *http.Response) (*ListEvmTokenBalance
 			return nil, err
 		}
 		response.JSON502 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest ServiceUnavailableError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListVaultsResponse parses an HTTP response from a ListVaultsWithResponse call
+func ParseListVaultsResponse(rsp *http.Response) (*ListVaultsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListVaultsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			// NextPageToken The token for the next page of items, if any.
+			NextPageToken *string `json:"nextPageToken,omitempty"`
+
+			// Vaults The list of vaults created by the project.
+			Vaults []Vault `json:"vaults"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest UnauthorizedError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest ServiceUnavailableError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetVaultResponse parses an HTTP response from a GetVaultWithResponse call
+func ParseGetVaultResponse(rsp *http.Response) (*GetVaultResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetVaultResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Vault
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest UnauthorizedError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
 		var dest ServiceUnavailableError
@@ -51438,6 +53447,246 @@ func ParseRequestLimitsUpgradeResponse(rsp *http.Response) (*RequestLimitsUpgrad
 			return nil, err
 		}
 		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateOnrampIosAttestationChallengeResponse parses an HTTP response from a CreateOnrampIosAttestationChallengeWithResponse call
+func ParseCreateOnrampIosAttestationChallengeResponse(rsp *http.Response) (*CreateOnrampIosAttestationChallengeResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateOnrampIosAttestationChallengeResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest IosAttestationChallenge
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest UnauthorizedError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest ForbiddenError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest RateLimitExceeded
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRegisterOnrampIosAttestationResponse parses an HTTP response from a RegisterOnrampIosAttestationWithResponse call
+func ParseRegisterOnrampIosAttestationResponse(rsp *http.Response) (*RegisterOnrampIosAttestationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RegisterOnrampIosAttestationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest IosAttestationRegistrationResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest RateLimitExceeded
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateOnrampMobileSessionResponse parses an HTTP response from a CreateOnrampMobileSessionWithResponse call
+func ParseCreateOnrampMobileSessionResponse(rsp *http.Response) (*CreateOnrampMobileSessionResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateOnrampMobileSessionResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest struct {
+			// Session An onramp session containing a ready-to-use onramp URL.
+			Session OnrampSession `json:"session"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest RateLimitExceeded
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest ServiceUnavailableError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateOnrampMobileChallengeResponse parses an HTTP response from a CreateOnrampMobileChallengeWithResponse call
+func ParseCreateOnrampMobileChallengeResponse(rsp *http.Response) (*CreateOnrampMobileChallengeResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateOnrampMobileChallengeResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest OnrampMobileChallenge
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest UnauthorizedError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest RateLimitExceeded
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON429 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest ServiceUnavailableError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
 
 	}
 
@@ -53459,6 +55708,142 @@ func ParseUpdatePolicyResponse(rsp *http.Response) (*UpdatePolicyResponse, error
 			return nil, err
 		}
 		response.JSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest IdempotencyError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 502:
+		var dest BadGatewayError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON502 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest ServiceUnavailableError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePausePolicyResponse parses an HTTP response from a PausePolicyWithResponse call
+func ParsePausePolicyResponse(rsp *http.Response) (*PausePolicyResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PausePolicyResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Policy
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest IdempotencyError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 502:
+		var dest BadGatewayError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON502 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest ServiceUnavailableError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseResumePolicyResponse parses an HTTP response from a ResumePolicyWithResponse call
+func ParseResumePolicyResponse(rsp *http.Response) (*ResumePolicyResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ResumePolicyResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Policy
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
 		var dest IdempotencyError
